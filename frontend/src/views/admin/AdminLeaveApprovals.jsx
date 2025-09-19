@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { initialLeaveRequests } from "../../data/mockData"; // .js extension hata diya gaya hai
+import { initialLeaveRequests } from "../../data/mockData"; 
 import {
   CheckIcon,
   XMarkIcon,

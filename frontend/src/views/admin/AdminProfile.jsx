@@ -6,10 +6,9 @@ import {
   PhoneIcon,
   CakeIcon,
   PencilIcon,
-  ArrowRightOnRectangleIcon, // Logout ke liye icon
+  ArrowRightOnRectangleIcon, 
 } from "@heroicons/react/24/outline";
 
-// Logout button ke liye 'onLogout' prop add kiya gaya hai
 export default function AdminProfile({ user, onLogout }) {
   const adminDetails = [
     {
@@ -44,7 +43,6 @@ export default function AdminProfile({ user, onLogout }) {
       </h2>
 
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        {/* Profile Header section ko update kiya gaya hai */}
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
           <img
             src={user?.profile?.imageUrl || `https://placehold.co/128x128/EFEFEF/3B82F6?text=${adminName.charAt(0)}`}
@@ -59,7 +57,6 @@ export default function AdminProfile({ user, onLogout }) {
             <p className="text-md text-gray-500 dark:text-gray-400">
               {user?.role}
             </p>
-            {/* Edit aur Logout buttons add kiye gaye */}
             <div className="mt-4 flex justify-center sm:justify-start space-x-3">
               <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm">
                 <PencilIcon className="h-4 w-4 mr-2" />

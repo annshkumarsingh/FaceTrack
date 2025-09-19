@@ -1,11 +1,10 @@
 import React from "react";
-import { initialReportsData } from "../../data/mockData"; // .js extension hata diya gaya hai
+import { initialReportsData } from "../../data/mockData"; 
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 
 export default function StudentReports() {
   const handleDownload = (report) => {
     alert(`Pretending to download: ${report.name}`);
-    // Real application mein yahan file download ka logic aayega
   };
 
   return (

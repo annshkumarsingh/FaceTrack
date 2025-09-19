@@ -43,7 +43,6 @@ export default function Sidebar({
         (isSidebarOpen ? "w-64" : "w-0")
       }
     >
-      {/* Background color wapas dark kar diya hai aur logo hata diya hai */}
       <div className="h-16 flex items-center justify-center px-4 font-bold text-lg border-b border-gray-700 whitespace-nowrap">
         <span>FaceTrack</span>
       </div>

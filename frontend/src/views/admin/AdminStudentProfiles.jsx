@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { initialUsers } from "../../data/mockData"; // .js extension hata diya gaya hai
+import { initialUsers } from "../../data/mockData";
 import { MagnifyingGlassIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function AdminStudentProfiles() {
@@ -28,7 +28,6 @@ export default function AdminStudentProfiles() {
   
   const handleDelete = (rollNo) => {
     if (window.confirm(`Are you sure you want to delete student with Roll No: ${rollNo}? This action cannot be undone.`)) {
-        // This is a mock delete. In a real app, you would make an API call.
         alert(`Student with Roll No: ${rollNo} has been deleted (mock).`);
         setStudents(students.filter(s => s.profile.rollNo !== rollNo));
     }

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { initialLeaveRequests } from "../../data/mockData.js";
-// Icons import kiye gaye hain
 import {
   PaperClipIcon,
   ClockIcon,
@@ -10,14 +9,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function StudentLeave({ user }) {
-  // Aapke existing state ko use kiya gaya hai
   const [requests, setRequests] = useState(initialLeaveRequests);
   const [form, setForm] = useState({ from: "", to: "", reason: "" });
-  // File upload ke liye naya state
   const [document, setDocument] = useState(null);
 
   const handleChange = (e) => {
-    // Yahan par syntax error theek kiya gaya hai ('of' ki jagah '=')
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -38,23 +34,20 @@ export default function StudentLeave({ user }) {
     const newRequest = {
       id: requests.length + 1,
       studentName: user.profile.name,
-      studentId: user.email, // Roll number ki jagah email use kiya
+      studentId: user.email, 
       from: form.from,
       to: form.to,
       reason: form.reason,
       status: "Pending",
-      // Document ka naam save kiya
       document: document ? document.name : "No document",
     };
 
     setRequests([newRequest, ...requests]);
-    // Form aur document state reset kiya
     setForm({ from: "", to: "", reason: "" });
     setDocument(null);
     alert("Leave request submitted successfully!");
   };
 
-  // Status ko sundar dikhane ke liye function
   const getStatusChip = (status) => {
     switch (status) {
       case "Approved":
@@ -136,7 +129,6 @@ export default function StudentLeave({ user }) {
           />
         </div>
 
-        {/* File Upload Section Add Kiya Gaya */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Upload Supporting Document

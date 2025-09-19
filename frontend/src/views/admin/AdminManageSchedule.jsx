@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { initialSchedule } from "../../data/mockData"; // .js extension hata diya gaya hai
+import { initialSchedule } from "../../data/mockData";
 import { ArrowUpTrayIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
 
 export default function AdminManageSchedule() {
@@ -11,7 +11,6 @@ export default function AdminManageSchedule() {
     if (file) {
       setFileName(file.name);
       alert(`File selected: ${file.name}. In a real app, this would be uploaded and processed.`);
-      // Future logic: parse PDF/Excel and update schedule state
     }
   };
 

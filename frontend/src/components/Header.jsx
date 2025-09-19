@@ -3,19 +3,19 @@ import {
   SunIcon,
   MoonIcon,
   BellIcon,
-  ArrowLeftOnRectangleIcon, // Logout ke liye naya icon
-  Bars3Icon, // Hamburger menu ke liye
+  ArrowLeftOnRectangleIcon, 
+  Bars3Icon, 
 } from "@heroicons/react/24/outline";
 
 export default function Header({
   user,
   onLogout,
   onToggleTheme,
-  setActiveView, // Profile par navigate karne ke liye
-  toggleSidebar, // Sidebar ko toggle karne ke liye
+  setActiveView, 
+  toggleSidebar, 
   darkMode,
 }) {
-  // Dono student aur admin ke liye profile se naam nikalne ka logic
+  
   const userName = user?.profile?.name || "User";
 
   return (
@@ -59,7 +59,7 @@ export default function Header({
         </button>
 
         <div className="flex items-center space-x-3">
-          {/* Profile link (image aur naam par click karne se kaam karega) */}
+          {/* Profile link */}
           <button
             onClick={() => setActiveView("profile")}
             className="flex items-center space-x-2 rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"

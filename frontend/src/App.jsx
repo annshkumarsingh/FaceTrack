@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-// Components & Views (Paths fixed with extensions)
+// Components & Views
 import LockScreen from "./components/LockScreen.jsx";
 import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";

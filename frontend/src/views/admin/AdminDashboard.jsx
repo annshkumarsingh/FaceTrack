@@ -5,10 +5,8 @@ import {
   CheckBadgeIcon,
   MegaphoneIcon,
 } from "@heroicons/react/24/outline";
-// Path ko theek kar diya gaya hai
 import { initialLeaveRequests, initialUsers } from "../../data/mockData.js";
 
-// Yeh ek helper function hai jo data count karega
 const getDashboardStats = () => {
   const pendingLeaves = initialLeaveRequests.filter(
     (req) => req.status === "Pending"
@@ -79,7 +77,7 @@ export default function AdminDashboard({ user, setActiveView }) {
         ))}
       </div>
 
-      {/* Ek chhota sa "Quick Actions" section */}
+      {/* "Quick Actions" */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
           Quick Actions

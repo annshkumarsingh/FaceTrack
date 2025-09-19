@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { initialAnnouncements } from "../../data/mockData"; // .js extension hata diya gaya hai
+import { initialAnnouncements } from "../../data/mockData";
 // import { callGeminiAPI } from "../../utils/api"; // Assuming this exists
 import { PlusIcon, SparklesIcon, TrashIcon } from "@heroicons/react/24/outline";
 
@@ -33,9 +33,6 @@ export default function AdminAnnouncements() {
   const handleGenerateAI = async () => {
     if (!title) return alert("Please enter a title first to give context to the AI.");
     setLoadingAI(true);
-    // const prompt = `Write a professional university announcement with the title: "${title}".`;
-    // const text = await callGeminiAPI(prompt);
-    // Using dummy text for now as API might not be set up
     const text = `This is an important notice regarding the upcoming ${title}. All students are requested to check the university portal for the detailed schedule and guidelines. Please ensure you have completed all necessary formalities beforehand.`;
     setContent(text);
     setLoadingAI(false);

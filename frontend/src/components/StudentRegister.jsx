@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
-// --- Icon Components (Same as AdminRegister for consistency) ---
+// --- Icon Components ---
 const EyeIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +50,7 @@ const EyeSlashIcon = () => (
   </svg>
 );
 
-// --- StudentRegister Form Component (Updated) ---
+// --- StudentRegister Form Component ---
 const StudentRegister = ({ onBack, onRegister }) => {
   const [form, setForm] = useState({
     fullName: "",
