@@ -15,15 +15,13 @@ export default function LoginForm({ role, onLogin, onBack, onForgotPassword }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(""); // Har submit par purana error clear karein
+    setError(""); 
 
     if (!email || !password) {
       setError("Please enter both email and password.");
       return;
     }
 
-    // YAHAN BADLAV KIYA GAYA HAI
-    // Ab hum App.jsx ko email, password, aur role teeno bhej rahe hain
     const loginSuccess = onLogin(email, password, role);
 
     if (!loginSuccess) {
@@ -96,7 +94,6 @@ export default function LoginForm({ role, onLogin, onBack, onForgotPassword }) {
           </div>
         </div>
 
-        {/* Error message ab yahan dikhega */}
         {error && <p className="text-sm text-center text-red-600">{error}</p>}
 
         <div className="flex items-center justify-between">
