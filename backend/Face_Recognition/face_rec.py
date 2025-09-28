@@ -1,6 +1,7 @@
 import cv2
 import os
 import csv
+import time
 from deepface import DeepFace
 
 # Folder with known faces
@@ -31,6 +32,11 @@ known_faces = {img: os.path.join(faces_dir, img) for img in os.listdir(faces_dir
 cap = cv2.VideoCapture(0)
 
 print("Press ESC to exit...")
+
+# Initialize variables
+frame_count = 0
+last_recognition_time = 0
+text = "Ready..."
 
 while True:
     ret, frame = cap.read()
@@ -63,8 +69,9 @@ while True:
                     break
             else:
                 text = "Unknown"
-    except:
-        text = "No face detected"
+                
+        except Exception as e:
+            text = "No face detected"
 
     # Display result
     cv2.putText(frame, text, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)

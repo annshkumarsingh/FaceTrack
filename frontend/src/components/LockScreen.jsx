@@ -67,7 +67,7 @@ export default function LockScreen({ onLogin, onRegister, users }) {
       </div>
 
       {/*  start attendance currenlty simple setup wiull add subject with date later */}
-      <button onClick={startAttendance} className=" mt-6 bg-blue-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
+      <button onClick={startAttendance} className=" mt-6 w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
   Start Attendance
 </button>
     </div>
