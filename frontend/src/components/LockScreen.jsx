@@ -15,6 +15,23 @@ export default function LockScreen({ onLogin, onRegister, users }) {
     setView("resetForm");
   };
 
+  //Attendance system
+  const startAttendance = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/start-attendance", {
+        method: "POST",
+      });
+      const data = await res.json();
+      console.log(data);
+      alert("Attendance system started!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to start attendance system");
+    }
+  };
+
+
+
   const RoleChoiceScreen = () => (
     <div className="text-center w-full">
       <img
@@ -48,6 +65,11 @@ export default function LockScreen({ onLogin, onRegister, users }) {
           Admin
         </button>
       </div>
+
+      {/*  start attendance currenlty simple setup wiull add subject with date later */}
+      <button onClick={startAttendance} className=" mt-6 bg-blue-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
+  Start Attendance
+</button>
     </div>
   );
 

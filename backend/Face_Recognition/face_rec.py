@@ -37,16 +37,30 @@ while True:
     if not ret:
         break
 
-    # Try to recognize face in the frame
-    try:
-        for name, path in known_faces.items():
-            result = DeepFace.verify(frame, path, model_name="ArcFace", enforce_detection=False)
-
-            if result["verified"]:
-                person_name = os.path.splitext(name)[0]
-                text = f"{person_name} (Present)"
-                mark_attendance(person_name)
-                break
+    frame_count += 1
+    current_time = time.time()
+    
+    # Only process every 30th frame (1 second at 30fps) instead of every frame
+    if frame_count % 30 == 0 and (current_time - last_recognition_time) > 2:
+        text = "Processing..."
+        
+        try:
+            # Use faster model and lower resolution
+            small_frame = cv2.resize(frame, (320, 240))
+            
+            for name, path in known_faces.items():
+                # Use faster model
+                result = DeepFace.verify(small_frame, path, 
+                                       model_name="Facenet",  # Faster than ArcFace
+                                       enforce_detection=False,
+                                       distance_metric="euclidean")
+                
+                if result["verified"]:
+                    person_name = os.path.splitext(name)[0]
+                    text = f"{person_name} (Present)"
+                    mark_attendance(person_name)
+                    last_recognition_time = current_time
+                    break
             else:
                 text = "Unknown"
     except:

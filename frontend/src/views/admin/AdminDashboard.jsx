@@ -52,6 +52,10 @@ export default function AdminDashboard({ user, setActiveView }) {
     },
   ];
 
+
+
+
+
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
@@ -97,6 +101,9 @@ export default function AdminDashboard({ user, setActiveView }) {
           </button>
         </div>
       </div>
+    
+    
+    
     </div>
   );
 }
