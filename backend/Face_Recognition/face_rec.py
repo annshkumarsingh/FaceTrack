@@ -6,7 +6,9 @@ from deepface import DeepFace
 
 # Folder with known faces
 faces_dir = "Faces"
-
+if not os.path.exists(faces_dir):
+    os.makedirs(faces_dir)
+    print(f"Created {faces_dir} directory. Please add face images to this folder.")
 # Attendance log file
 attendance_file = "attendance.csv"
 
