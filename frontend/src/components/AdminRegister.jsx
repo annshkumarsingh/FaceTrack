@@ -60,6 +60,11 @@ const AdminRegister = ({ onBack, onRegister }) => {
     password: "",
     confirmPassword: "",
     profilePic: "",
+    role: "Admin",
+    rollNumber: "N/A",
+    semester: "N/A",
+    phone:"N/A",
+    course:"N/A"
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);

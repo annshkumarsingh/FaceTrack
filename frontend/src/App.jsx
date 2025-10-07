@@ -42,18 +42,56 @@ export default function App() {
     return false;
   };
 
-  const handleRegister = (email, newUser) => {
-    if (users[email]) {
-      alert("This email is already registered!");
+  const handleRegister =async (email, newUser) => {
+        
+    try {
+      const response = await fetch("http://localhost:5000/register", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              fullName: newUser.fullName,
+              rollNumber: newUser.rollNumber,
+              course: newUser.course,
+              semester: newUser.semester,
+              phone: newUser.phone,
+              email: email,
+              password: newUser.password,
+              profilePic: newUser.profilePic,
+              role: newUser.role,
+              designation:newUser.designation,
+              department:newUser.department
+          }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+          alert(data.detail || "Registration failed!");
+          return;
+      }
+
+      alert("✅ Registration successful!");
+      setCurrentUser(data.user);
+      setActiveView("dashboard");
+  } catch (error) {
+      alert("Registration failed!");
       return;
-    }
-    const userWithEmail = { ...newUser, email };
-    setUsers(prevUsers => ({
-      ...prevUsers,
-      [email]: userWithEmail,
-    }));
-    setCurrentUser(userWithEmail);
-    setActiveView("dashboard");
+  }
+
+
+
+    // if (users[email]) {
+    //   alert("This email is already registered!");
+    //   return;
+    // }
+    // const userWithEmail = { ...newUser, email };
+    // setUsers(prevUsers => ({
+    //   ...prevUsers,
+    //   [email]: userWithEmail,
+    // }));
+   
   };
 
   const handleLogout = () => {

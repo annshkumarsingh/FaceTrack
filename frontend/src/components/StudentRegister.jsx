@@ -101,6 +101,9 @@ const StudentRegister = ({ onBack, onRegister }) => {
     if (!form.phone.trim()) newErrors.phone = "Phone number is required";
     if (!form.email.endsWith("@jcboseust.ac.in"))
       newErrors.email = "Must be a valid college email";
+    if (form.password.length > 72) {
+      newErrors.password = "Password must be 72 characters or less";
+    }
     if (!validatePassword(form.password))
       newErrors.password =
         "Password must be 8+ chars, with upper, lower, digit, & special char.";
