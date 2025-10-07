@@ -1,10 +1,17 @@
-from fastapi import FastAPI
+from fastapi import FastAPI , Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from database.database import get_db
 import uvicorn
 import subprocess
 import os
+import bcrypt
+from pydantic import BaseModel, EmailStr
+from database.database import get_db
+from database.models import User
+from sqlalchemy.orm import Session
+from fastapi import HTTPException
+
 
 app = FastAPI()
 
@@ -23,6 +30,33 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+# //base models
+class UserRegister(BaseModel):
+    fullName: str
+    rollNumber: str
+    course: str
+    semester: str
+    phone: str
+    email: EmailStr
+    password: str
+    role: str = "Student"
+    profilePic: str | None = None
+    
+
+
+# helper function use it during both registeration and login
+def prepare_password_for_bcrypt(password: str) -> str:
+    """Prepare password for bcrypt by truncating if necessary"""
+    password_bytes = password.encode('utf-8')
+    if len(password_bytes) > 72:
+        return password_bytes[:72].decode('utf-8', errors='ignore')
+    return password
+
+
+
 
 @app.get("/")
 def home():
@@ -65,6 +99,50 @@ def start_attendance():
         return JSONResponse(content={"status": "started", "message": "Attendance system launched"})
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
+
+@app.post("/register")
+def register_user(user: UserRegister, db: Session = Depends(get_db)):
+    # check if email or roll number exists
+    existing = db.query(User).filter(
+        (User.email == user.email) | (User.roll_number == user.rollNumber)
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="User already registered")
+
+    # MISSING LINE: Call your helper function to prepare the password
+    prepared_password = prepare_password_for_bcrypt(user.password)
+    
+    salt = bcrypt.gensalt()
+    hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
+
+    new_user = User(
+        full_name=user.fullName,
+        roll_number=user.rollNumber,
+        course=user.course,
+        semester=user.semester,
+        phone=user.phone,
+        email=user.email,
+        password=hashed_pw,
+        profile_pic=user.profilePic,
+        role=user.role,
+        
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {
+        "message": "Registration successful",
+        "user": {
+            "id": new_user.id,
+            "email": new_user.email,
+            "name": new_user.full_name,
+            "role": new_user.role,
+        },
+    }
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000)

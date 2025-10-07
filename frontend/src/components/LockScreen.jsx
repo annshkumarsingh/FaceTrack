@@ -128,23 +128,24 @@ export default function LockScreen({ onLogin, onRegister, users }) {
       case "studentRegisterForm":
         return (
           <StudentRegister
-            onRegister={(email, newUser) => {
-              onRegister(newUser);
-              setRole("Student");
-              setResetEmail(email);
-              setView("registerSuccess");
-            }}
-            onBack={() => setView("actionChoice")}
+          onRegister={(email, newUser) => {
+            onRegister(email, newUser); // Pass email as first parameter
+            // Remove these lines that set registerSuccess view
+            // setRole("Student");
+            // setResetEmail(email);
+            // setView("registerSuccess");
+          }}
+          onBack={() => setView("actionChoice")}
           />
         );
       case "adminRegisterForm":
         return (
           <AdminRegister
             onRegister={(email, newUser) => {
-              onRegister(newUser);
-              setRole("Admin");
-              setResetEmail(email);
-              setView("registerSuccess");
+              onRegister(email,newUser);
+              // setRole("Admin");
+              // setResetEmail(email);
+              // setView("registerSuccess");
             }}
             onBack={() => setView("actionChoice")}
           />

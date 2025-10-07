@@ -1,20 +1,30 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, text
 from sqlalchemy.orm import relationship
-from database import Base
+from database.database import Base
 
 # ---------------------
 # USERS TABLE
 # ---------------------
 class User(Base):
+   
+   
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    full_name = Column(String, nullable=False)
+    roll_number = Column(String, unique=True, nullable=True)
+    course = Column(String, nullable=True)
+    semester = Column(String, nullable=True)
+    phone = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    role = Column(String, nullable=False)  # "student" or "teacher"
-    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+    password = Column(String, nullable=False)
+    profile_pic = Column(String, nullable=True)  # store file URL
+    role = Column(String, nullable=False, default="Student")
+    # for teachers
+    designation = Column(String, nullable=True)
+    department = Column(String, nullable=True)
 
-    # Relationships
+     # Relationships
     classes = relationship("Class", back_populates="teacher")
     attendance_records = relationship("Attendance", back_populates="student")
 
