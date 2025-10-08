@@ -44,7 +44,10 @@ class UserRegister(BaseModel):
     password: str
     role: str = "Student"
     profilePic: str | None = None
-    
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str  
 
 
 # helper function use it during both registeration and login
@@ -104,21 +107,28 @@ def start_attendance():
 @app.post("/register")
 def register_user(user: UserRegister, db: Session = Depends(get_db)):
     # check if email or roll number exists
-    existing = db.query(User).filter(
-        (User.email == user.email) | (User.roll_number == user.rollNumber)
-    ).first()
+    existing = db.query(User).filter(User.email == user.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="User already registered")
 
-    # MISSING LINE: Call your helper function to prepare the password
+    # Check roll number only for Students
+    if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+        existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
+        if existing_roll:
+            raise HTTPException(status_code=400, detail="Roll number already exists")
+
     prepared_password = prepare_password_for_bcrypt(user.password)
-    
     salt = bcrypt.gensalt()
     hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
 
+    # Set roll_number to None for non-students or "N/A" values
+    roll_number_value = None
+    if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+        roll_number_value = user.rollNumber
+
     new_user = User(
         full_name=user.fullName,
-        roll_number=user.rollNumber,
+        roll_number=roll_number_value,  # This will be NULL in database
         course=user.course,
         semester=user.semester,
         phone=user.phone,
@@ -126,7 +136,6 @@ def register_user(user: UserRegister, db: Session = Depends(get_db)):
         password=hashed_pw,
         profile_pic=user.profilePic,
         role=user.role,
-        
     )
 
     db.add(new_user)
@@ -142,6 +151,35 @@ def register_user(user: UserRegister, db: Session = Depends(get_db)):
             "role": new_user.role,
         },
     }
+
+
+@app.post("/login")
+def login_user(user:UserLogin , db: Session = Depends(get_db)):
+    existingUser = db.query(User).filter(User.email == user.email).first()
+    if not existingUser:
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    prepared_password = prepare_password_for_bcrypt(user.password)
+    
+    # Verify password
+    if not bcrypt.checkpw(prepared_password.encode('utf-8'), existingUser.password.encode('utf-8')):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    return {
+        "message": "Login successful",
+        "user": {
+            "id": existingUser.id,
+            "email": existingUser.email,
+            "name": existingUser.full_name,
+            "role": existingUser.role,
+            "roll_number": existingUser.roll_number,
+            "course": existingUser.course,
+            "semester": existingUser.semester,
+            "department": existingUser.department if hasattr(existingUser, 'department') else None,
+            "designation": existingUser.designation if hasattr(existingUser, 'designation') else None
+        }
+    }
+
 
 
 if __name__ == "__main__":
