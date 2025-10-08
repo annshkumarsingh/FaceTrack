@@ -32,15 +32,50 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const handleLogin = (email, password, role) => {
-    const user = users[email];
-    if (user && user.password === password && user.role === role) {
-      setCurrentUser({ ...user, email });
-      setActiveView("dashboard");
-      return true;
+  const handleLogin = async (email, password, role) => {
+    try {
+      const response = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // Check if user role matches the selected role
+        if (data.user.role === role) {
+          setCurrentUser({
+            ...data.user,
+            email: data.user.email,
+            name: data.user.name,
+            role: data.user.role,
+            roll_number: data.user.roll_number,
+            course: data.user.course,
+            semester: data.user.semester
+          });
+          setActiveView("dashboard");
+          return true;
+        } else {
+          alert(`Invalid role. User is registered as ${data.user.role}`);
+          return false;
+        }
+      } else {
+        alert(data.detail || 'Login failed');
+        return false;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Network error. Please check your connection.');
+      return false;
     }
-    return false;
   };
+  
 
   const handleRegister =async (email, newUser) => {
         
