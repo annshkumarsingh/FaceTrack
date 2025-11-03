@@ -1,17 +1,15 @@
-from fastapi import FastAPI , Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from database.database import get_db
-import uvicorn
-import subprocess
-import os
-import bcrypt
-from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
 from database.database import get_db
 from database.models import User
-from sqlalchemy.orm import Session
-from fastapi import HTTPException
-
+from pydantic import BaseModel, EmailStr
+import uvicorn
+import bcrypt
+import subprocess
+import sys
+import os
 
 app = FastAPI()
 
@@ -31,9 +29,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-# //base models
+# ---------------------------
+# MODELS
+# ---------------------------
 class UserRegister(BaseModel):
     fullName: str
     rollNumber: str
@@ -50,7 +48,9 @@ class UserLogin(BaseModel):
     password: str  
 
 
-# helper function use it during both registeration and login
+# ---------------------------
+# PASSWORD HELPERS
+# ---------------------------
 def prepare_password_for_bcrypt(password: str) -> str:
     """Prepare password for bcrypt by truncating if necessary"""
     password_bytes = password.encode('utf-8')
@@ -59,8 +59,9 @@ def prepare_password_for_bcrypt(password: str) -> str:
     return password
 
 
-
-
+# ---------------------------
+# HOME PAGE
+# ---------------------------
 @app.get("/")
 def home():
     html_content = '''
@@ -74,44 +75,42 @@ def home():
     </html>
     '''
     return HTMLResponse(content=html_content)
+
+
+# ---------------------------
+# START ATTENDANCE
+# ---------------------------
 @app.post("/start-attendance")
 def start_attendance():
     try:
-        face_recognition_dir = os.path.join(os.getcwd(), "Face_Recognition")
-        script_path = os.path.join(face_recognition_dir, "face_rec.py")
-        
-        # Fix: Use Scripts instead of bin for Windows
-        python_path = os.path.join(os.getcwd(), ".venv", "Scripts", "python.exe")
-        
-        print("Running:", script_path)
-        print("Python path:", python_path)
-        
-        # Fix: Use full script path
-        subprocess.Popen([python_path, script_path], shell=True)
-        return JSONResponse(content={"status": "started", "message": "Attendance system launched"})
-    except Exception as e:
-        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        script_path = os.path.join(base_dir, "Face_Recognition", "face_rec.py")
 
-    try:
-        face_recognition_dir = os.path.join(os.getcwd(), "Face_Recognition")
-        script_path = os.path.join(face_recognition_dir, "face_rec.py")
-        python_path = os.path.join(os.getcwd(), ".venv", "Scripts", "python.exe")
-        print("Running:", script_path)
-        
-        subprocess.Popen([python_path, "face_rec.py"], cwd=face_recognition_dir, shell=True)
+        if not os.path.exists(script_path):
+            raise FileNotFoundError(f"Could not find: {script_path}")
+
+        # ✅ Use the same Python executable as the running FastAPI app
+        python_executable = sys.executable
+
+        print(f"Running: {script_path}")
+        print(f"Python path: {python_executable}")
+
+        subprocess.Popen([python_executable, script_path])
         return JSONResponse(content={"status": "started", "message": "Attendance system launched"})
+
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
 
 
+# ---------------------------
+# REGISTER
+# ---------------------------
 @app.post("/register")
 def register_user(user: UserRegister, db: Session = Depends(get_db)):
-    # check if email or roll number exists
     existing = db.query(User).filter(User.email == user.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="User already registered")
 
-    # Check roll number only for Students
     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
         existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
         if existing_roll:
@@ -121,14 +120,13 @@ def register_user(user: UserRegister, db: Session = Depends(get_db)):
     salt = bcrypt.gensalt()
     hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
 
-    # Set roll_number to None for non-students or "N/A" values
     roll_number_value = None
     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
         roll_number_value = user.rollNumber
 
     new_user = User(
         full_name=user.fullName,
-        roll_number=roll_number_value,  # This will be NULL in database
+        roll_number=roll_number_value,
         course=user.course,
         semester=user.semester,
         phone=user.phone,
@@ -153,15 +151,16 @@ def register_user(user: UserRegister, db: Session = Depends(get_db)):
     }
 
 
+# ---------------------------
+# LOGIN
+# ---------------------------
 @app.post("/login")
-def login_user(user:UserLogin , db: Session = Depends(get_db)):
+def login_user(user: UserLogin, db: Session = Depends(get_db)):
     existingUser = db.query(User).filter(User.email == user.email).first()
     if not existingUser:
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
     prepared_password = prepare_password_for_bcrypt(user.password)
-    
-    # Verify password
     if not bcrypt.checkpw(prepared_password.encode('utf-8'), existingUser.password.encode('utf-8')):
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
@@ -175,12 +174,14 @@ def login_user(user:UserLogin , db: Session = Depends(get_db)):
             "roll_number": existingUser.roll_number,
             "course": existingUser.course,
             "semester": existingUser.semester,
-            "department": existingUser.department if hasattr(existingUser, 'department') else None,
-            "designation": existingUser.designation if hasattr(existingUser, 'designation') else None
+            "department": getattr(existingUser, 'department', None),
+            "designation": getattr(existingUser, 'designation', None)
         }
     }
 
 
-
+# ---------------------------
+# SERVER START
+# ---------------------------
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000)

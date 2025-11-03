@@ -3,19 +3,19 @@ import { initialAnnouncements } from "../../data/mockData.js";
 export default function StudentDashboard({ user }) {
   const [aiPlan, setAiPlan] = useState("");
 
-  useEffect(() => {
-    const overall = user?.attendanceSummary?.overall || 100;
-    if (overall < 75) {
-      setAiPlan(
-        `Your attendance is below 75%. Here is a suggested plan:\n1. Attend all upcoming lectures for critical subjects.\n2. Meet with your subject teachers to discuss catch-up topics.\n3. Dedicate an extra hour daily for self-study.`
-      );
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   const overall = user?.attendanceSummary?.overall || 100;
+  //   if (overall < 75) {
+  //     setAiPlan(
+  //       `Your attendance is below 75%. Here is a suggested plan:\n1. Attend all upcoming lectures for critical subjects.\n2. Meet with your subject teachers to discuss catch-up topics.\n3. Dedicate an extra hour daily for self-study.`
+  //     );
+  //   }
+  // }, [user]);
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-        Welcome, {user.profile.name}
+        Welcome, {user.name}
       </h2>
 
       {/* Attendance Summary */}
@@ -23,7 +23,7 @@ export default function StudentDashboard({ user }) {
         <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
           Attendance Summary
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
+        {/* <p className="text-gray-600 dark:text-gray-400">
           Overall Attendance:{" "}
           <span
             className={
@@ -34,7 +34,7 @@ export default function StudentDashboard({ user }) {
           >
             {user.attendanceSummary.overall}%
           </span>
-        </p>
+        </p> */}
       </div>
 
       {/* Announcements */}
