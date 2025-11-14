@@ -60,6 +60,13 @@ class ScheduleItem(BaseModel):
     course: str | None = None
     semester: str | None = None
 
+
+
+
+
+
+
+
 # ---------------------------
 # PASSWORD HELPERS
 # ---------------------------
@@ -71,6 +78,141 @@ def prepare_password_for_bcrypt(password: str) -> str:
     return password
 
 # ... (keep all your existing routes: home, start-attendance, register, login) ...
+
+
+
+
+
+
+
+
+
+# ---------------------------
+# HOME PAGE
+# ---------------------------
+@app.get("/")
+def home():
+    html_content = '''
+    <html>
+        <body>
+            <h2>AI Attendance System</h2>
+            <form action="/start-attendance" method="post">
+                <button type="submit" style="padding: 10px 20px; font-size: 16px;">Start Attendance</button>
+            </form>
+        </body>
+    </html>
+    '''
+    return HTMLResponse(content=html_content)
+
+
+# ---------------------------
+# START ATTENDANCE
+# ---------------------------
+@app.post("/start-attendance")
+def start_attendance():
+    try:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        script_path = os.path.join(base_dir, "Face_Recognition", "face_rec.py")
+
+        if not os.path.exists(script_path):
+            raise FileNotFoundError(f"Could not find: {script_path}")
+
+        # ✅ Use the same Python executable as the running FastAPI app
+        python_executable = sys.executable
+
+        print(f"Running: {script_path}")
+        print(f"Python path: {python_executable}")
+
+        subprocess.Popen([python_executable, script_path])
+        return JSONResponse(content={"status": "started", "message": "Attendance system launched"})
+
+    except Exception as e:
+        return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
+
+# ---------------------------
+# REGISTER
+# ---------------------------
+@app.post("/register")
+def register_user(user: UserRegister, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == user.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="User already registered")
+
+    if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+        existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
+        if existing_roll:
+            raise HTTPException(status_code=400, detail="Roll number already exists")
+
+    prepared_password = prepare_password_for_bcrypt(user.password)
+    salt = bcrypt.gensalt()
+    hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
+
+    roll_number_value = None
+    if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+        roll_number_value = user.rollNumber
+
+    new_user = User(
+        full_name=user.fullName,
+        roll_number=roll_number_value,
+        course=user.course,
+        semester=user.semester,
+        phone=user.phone,
+        email=user.email,
+        password=hashed_pw,
+        profile_pic=user.profilePic,
+        role=user.role,
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {
+        "message": "Registration successful",
+        "user": {
+            "id": new_user.id,
+            "email": new_user.email,
+            "name": new_user.full_name,
+            "role": new_user.role,
+        },
+    }
+
+
+# ---------------------------
+# LOGIN
+# ---------------------------
+@app.post("/login")
+def login_user(user: UserLogin, db: Session = Depends(get_db)):
+    existingUser = db.query(User).filter(User.email == user.email).first()
+    if not existingUser:
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    prepared_password = prepare_password_for_bcrypt(user.password)
+    if not bcrypt.checkpw(prepared_password.encode('utf-8'), existingUser.password.encode('utf-8')):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    return {
+        "message": "Login successful",
+        "user": {
+            "id": existingUser.id,
+            "email": existingUser.email,
+            "name": existingUser.full_name,
+            "role": existingUser.role,
+            "roll_number": existingUser.roll_number,
+            "course": existingUser.course,
+            "semester": existingUser.semester,
+            "department": getattr(existingUser, 'department', None),
+            "designation": getattr(existingUser, 'designation', None)
+        }
+    }
+
+
+
+
+
+
+
 
 # ---------------------------
 # UPLOAD SCHEDULE (Excel/CSV/Image)
