@@ -60,3 +60,21 @@ class Attendance(Base):
     # Relationships
     student = relationship("User", back_populates="attendance_records")
     class_ = relationship("Class", back_populates="attendance_records")
+
+# ... your existing models ...
+
+# ---------------------
+# SCHEDULE TABLE
+# ---------------------
+class Schedule(Base):
+    __tablename__ = "schedules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    day = Column(String, nullable=False)
+    time = Column(String, nullable=False)
+    subject = Column(String, nullable=False)
+    teacher = Column(String, nullable=False)
+    course = Column(String, nullable=True)
+    semester = Column(String, nullable=True)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))

@@ -96,7 +96,7 @@ export default function LoginForm({ role, onLogin, onBack, onForgotPassword }) {
 
         {error && <p className="text-sm text-center text-red-600">{error}</p>}
 
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => onForgotPassword(email)}
@@ -104,7 +104,7 @@ export default function LoginForm({ role, onLogin, onBack, onForgotPassword }) {
           >
             Forgot password?
           </button>
-        </div>
+        </div> */}
 
         <div>
           <button
