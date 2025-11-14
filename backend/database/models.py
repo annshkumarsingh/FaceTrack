@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, text
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, DateTime, Text, text
 from sqlalchemy.orm import relationship
 from database.database import Base
 
@@ -78,3 +78,13 @@ class Schedule(Base):
     semester = Column(String, nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+class Announcement(Base):
+    __tablename__ = "announcements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    content = Column(Text, nullable=False)
+    date = Column(String, nullable=False)  # Stored as YYYY-MM-DD string for simplicity
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))    

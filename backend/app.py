@@ -3,7 +3,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database.database import get_db
-from database.models import User, Schedule
+from database.models import User, Schedule , Announcement
+from datetime import datetime 
 from pydantic import BaseModel, EmailStr
 import uvicorn
 import bcrypt
@@ -346,8 +347,114 @@ def add_schedule_manually(schedules: List[ScheduleItem], db: Session = Depends(g
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error adding schedule: {str(e)}")
 
+
+
+
+
+class AnnouncementCreate(BaseModel):
+    title: str
+    content: str
+
+class AnnouncementResponse(BaseModel):
+    id: int
+    title: str
+    content: str
+    date: str
+    
+    class Config:
+        from_attributes = True
+
+# ... your existing routes ...
+
+# ---------------------------
+# CREATE ANNOUNCEMENT
+# ---------------------------
+@app.post("/announcements", response_model=AnnouncementResponse)
+def create_announcement(announcement: AnnouncementCreate, db: Session = Depends(get_db)):
+    try:
+        # Get current date in YYYY-MM-DD format
+        current_date = datetime.utcnow().strftime("%Y-%m-%d")
+        
+        new_announcement = Announcement(
+            title=announcement.title,
+            content=announcement.content,
+            date=current_date
+        )
+        
+        db.add(new_announcement)
+        db.commit()
+        db.refresh(new_announcement)
+        
+        return new_announcement
+    
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating announcement: {str(e)}")
+
+# ---------------------------
+# GET ALL ANNOUNCEMENTS
+# ---------------------------
+@app.get("/announcements", response_model=List[AnnouncementResponse])
+def get_announcements(db: Session = Depends(get_db)):
+    announcements = db.query(Announcement).order_by(Announcement.created_at.desc()).all()
+    return announcements
+
+# ---------------------------
+# GET SINGLE ANNOUNCEMENT
+# ---------------------------
+@app.get("/announcements/{announcement_id}", response_model=AnnouncementResponse)
+def get_announcement(announcement_id: int, db: Session = Depends(get_db)):
+    announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
+    if not announcement:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    return announcement
+
+# ---------------------------
+# DELETE ANNOUNCEMENT
+# ---------------------------
+@app.delete("/announcements/{announcement_id}")
+def delete_announcement(announcement_id: int, db: Session = Depends(get_db)):
+    announcement = db.query(Announcement).filter(Announcement.id == announcement_id).first()
+    
+    if not announcement:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    
+    db.delete(announcement)
+    db.commit()
+    
+    return {"message": "Announcement deleted successfully"}
+
+# ---------------------------
+# UPDATE ANNOUNCEMENT (Optional)
+# ---------------------------
+@app.put("/announcements/{announcement_id}", response_model=AnnouncementResponse)
+def update_announcement(
+    announcement_id: int, 
+    announcement: AnnouncementCreate, 
+    db: Session = Depends(get_db)
+):
+    existing = db.query(Announcement).filter(Announcement.id == announcement_id).first()
+    
+    if not existing:
+        raise HTTPException(status_code=404, detail="Announcement not found")
+    
+    existing.title = announcement.title
+    existing.content = announcement.content
+    
+    db.commit()
+    db.refresh(existing)
+    
+    return existing
+
+
+
+
+
+
+
 # ---------------------------
 # SERVER START
 # ---------------------------
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000)
+
