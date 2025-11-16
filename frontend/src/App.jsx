@@ -26,7 +26,7 @@ import AdminProfile from "./views/admin/AdminProfile.jsx";
 import { initialUsers } from "./data/mockData.js";
 
 export default function App() {
-  const [users, setUsers] = useState(initialUsers);
+  // const [users, setUsers] = useState(initialUsers);
   const [currentUser, setCurrentUser] = useState(null);
   const [activeView, setActiveView] = useState("dashboard");
   const [darkMode, setDarkMode] = useState(false);
@@ -34,7 +34,7 @@ export default function App() {
 
   const handleLogin = async (email, password, role) => {
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('http://localhost:8000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export default function App() {
   const handleRegister =async (email, newUser) => {
         
     try {
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch("http://localhost:8000/register", {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
