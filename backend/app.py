@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database.database import get_db
-from database.models import User, Schedule , Announcement
+from database.models import User, Schedule, Announcement, Attendance
 from datetime import datetime 
 from pydantic import BaseModel, EmailStr
 import uvicorn
@@ -61,6 +61,10 @@ class ScheduleItem(BaseModel):
     course: str | None = None
     semester: str | None = None
 
+class AttendanceCreate(BaseModel):
+    student_id: int
+    class_id: int
+    status: str = "present"
 
 
 
@@ -129,6 +133,69 @@ def start_attendance():
 
     except Exception as e:
         return JSONResponse(content={"status": "error", "message": str(e)}, status_code=500)
+
+
+# ---------------------------
+# MARK ATTENDANCE
+# ---------------------------   
+@app.post("/attendance")
+def mark_attendance(data: AttendanceCreate, db: Session = Depends(get_db)):
+    try:
+        entry = Attendance(
+            student_id=data.student_id,
+            class_id=data.class_id,
+            status=data.status
+        )
+
+        db.add(entry)
+        db.commit()
+        db.refresh(entry)
+
+        return {
+            "success": True,
+            "entry": {
+                "id": entry.id,
+                "student_id": entry.student_id,
+                "class_id": entry.class_id,
+                "status": entry.status,
+                "marked_at": entry.marked_at
+            }
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+# ---------------------------
+# GET ATTENDANCE
+# --------------------------- 
+@app.get("/attendance")
+def get_attendance(db: Session = Depends(get_db)):
+    records = db.query(Attendance).order_by(Attendance.marked_at.desc()).all()
+
+    return [
+        {
+            "id": r.id,
+            "student_id": r.student_id,
+            "class_id": r.class_id,
+            "status": r.status,
+            "marked_at": r.marked_at,
+            "student_name": r.student.full_name if r.student else None,
+            "class_name": r.class_.name if r.class_ else None
+        }
+        for r in records
+    ]
+
+# --------------------------- 
+# GET STUDENT BY NAME
+# --------------------------- 
+@app.get("/getstudent/{name}")
+def get_student(name: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.full_name == name).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"id": user.id, "name": user.full_name}
 
 
 # ---------------------------
@@ -209,6 +276,32 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     }
 
 
+
+# ---------------------------
+# GET USER PROFILE
+# ---------------------------
+@app.get("/profile/id/{user_id}")
+def get_profile_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {
+        "id": user.id,
+        "name": user.full_name,
+        "email": user.email,
+        "roll_number": user.roll_number,
+        "course": user.course,
+        "semester": user.semester,
+        "phone": user.phone,
+        "department": getattr(user, "department", None),
+        "designation": getattr(user, "designation", None),
+        "profile_pic": user.profile_pic,
+        "role": user.role,
+        "college": getattr(user, "college", "YMCA"),
+        "address": getattr(user, "address", None),
+    }
 
 
 
@@ -456,5 +549,5 @@ def update_announcement(
 # SERVER START
 # ---------------------------
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
