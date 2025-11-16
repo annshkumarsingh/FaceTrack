@@ -1,8 +1,18 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 export default function StudentProfile({ user, onLogout }) {
   const [editing, setEditing] = useState(false)
-  const [profile, setProfile] = useState(user.profile)
+  const [profile, setProfile] = useState(user)
+
+  useEffect(() => {
+    fetch(`http://localhost:8000/profile/id/${user.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setProfile(data)
+        localStorage.setItem("user", JSON.stringify(data))
+      })
+      .catch((err) => console.log(err))
+  }, [user.id])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -24,7 +34,7 @@ export default function StudentProfile({ user, onLogout }) {
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-col md:flex-row gap-6">
         <div className="flex-shrink-0">
           <img
-            src={profile.imageUrl}
+            src={profile.profile_pic}
             alt={profile.name}
             className="h-32 w-32 rounded-full border object-cover"
           />
@@ -35,7 +45,7 @@ export default function StudentProfile({ user, onLogout }) {
             <strong>Name:</strong> {profile.name}
           </p>
           <p>
-            <strong>Roll No:</strong> {profile.rollNo}
+            <strong>Roll No:</strong> {profile.roll_number}
           </p>
           <p>
             <strong>Course:</strong> {profile.course}

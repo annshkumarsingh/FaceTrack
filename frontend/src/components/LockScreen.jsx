@@ -18,7 +18,7 @@ export default function LockScreen({ onLogin, onRegister, users }) {
   //Attendance system
   const startAttendance = async () => {
     try {
-      const res = await fetch("http://localhost:5000/start-attendance", {
+      const res = await fetch("http://localhost:8000/start-attendance", {
         method: "POST",
       });
       const data = await res.json();
@@ -68,8 +68,8 @@ export default function LockScreen({ onLogin, onRegister, users }) {
 
       {/*  start attendance currenlty simple setup wiull add subject with date later */}
       <button onClick={startAttendance} className=" mt-6 w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
-  Start Attendance
-</button>
+        Start Attendance
+      </button>
     </div>
   );
 
@@ -109,7 +109,7 @@ export default function LockScreen({ onLogin, onRegister, users }) {
       </div>
     </div>
   );
-  
+
   const renderContent = () => {
     switch (view) {
       case "roleChoice":
@@ -128,21 +128,21 @@ export default function LockScreen({ onLogin, onRegister, users }) {
       case "studentRegisterForm":
         return (
           <StudentRegister
-          onRegister={(email, newUser) => {
-            onRegister(email, newUser); // Pass email as first parameter
-            // Remove these lines that set registerSuccess view
-            // setRole("Student");
-            // setResetEmail(email);
-            // setView("registerSuccess");
-          }}
-          onBack={() => setView("actionChoice")}
+            onRegister={(email, newUser) => {
+              onRegister(email, newUser); // Pass email as first parameter
+              // Remove these lines that set registerSuccess view
+              // setRole("Student");
+              // setResetEmail(email);
+              // setView("registerSuccess");
+            }}
+            onBack={() => setView("actionChoice")}
           />
         );
       case "adminRegisterForm":
         return (
           <AdminRegister
             onRegister={(email, newUser) => {
-              onRegister(email,newUser);
+              onRegister(email, newUser);
               // setRole("Admin");
               // setResetEmail(email);
               // setView("registerSuccess");
@@ -165,23 +165,34 @@ export default function LockScreen({ onLogin, onRegister, users }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
-      <header className="bg-blue-800 text-white p-4 flex items-center justify-center shadow-md w-full top-0 z-10">
-        <div className="h-20 w-20 mr-4 rounded-xl bg-white overflow-hidden">
-          <img
-            src="/public/YMCA_Logo.jpg"
-            alt="University Logo"
-            className="h-full w-full object-cover"
-          />
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-slate-300 dark:from-gray-900 dark:to-gray-800">
+
+      {/* Header */}
+      <header className="backdrop-blur-md bg-white/20 dark:bg-gray-900/20 border-b border-white/30 dark:border-gray-700/30 shadow-lg sticky top-0 z-20">
+        <div className="container mx-auto flex items-center gap-6 py-4 px-6">
+          <div className="h-20 w-20 rounded-3xl overflow-hidden shadow-xl ring-2 ring-white/50 dark:ring-gray-700 flex-shrink-0">
+            <img
+              src="/YMCA_Logo.jpg"
+              alt="University Logo"
+              className="h-full w-full object-cover"
+            />
+          </div>
+
+          <div className="flex flex-col text-gray-900 dark:text-white">
+            <h1 className="text-3xl md:text-3xl font-medium tracking-tight drop-shadow-sm">
+              J.C. Bose University of Science and Technology
+            </h1>
+            <p className="md:text-lg text-base text-gray-700 dark:text-gray-300 font-normal tracking-wide">
+              YMCA, Faridabad
+            </p>
+          </div>
         </div>
-        <h1 className="text-2xl font-bold tracking-wide">
-          J.C. Bose University of Science and Technology, YMCA, Faridabad
-        </h1>
       </header>
 
-      <main className="flex flex-1 items-center justify-center p-4">
-        <div className="relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg w-full max-w-md">
-          {renderContent()}
+      {/* Main Content */}
+      <main className="flex flex-1 items-center justify-center px-4 py-14">
+        <div className="relative w-full max-w-xl p-10 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl">
+          {renderContent && renderContent()}
         </div>
       </main>
     </div>

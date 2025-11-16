@@ -17,7 +17,7 @@ export default function AdminAnnouncements() {
   const fetchAnnouncements = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/announcements");
+      const response = await fetch("http://localhost:8000/announcements");
       const data = await response.json();
       setAnnouncements(data);
     } catch (error) {
@@ -37,7 +37,7 @@ export default function AdminAnnouncements() {
     setPosting(true);
 
     try {
-      const response = await fetch("http://localhost:5000/announcements", {
+      const response = await fetch("http://localhost:8000/announcements", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +72,7 @@ export default function AdminAnnouncements() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/announcements/${id}`, {
+      const response = await fetch(`http:///announcements/${id}`, {
         method: "DELETE",
       });
 
