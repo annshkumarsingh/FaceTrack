@@ -4,6 +4,7 @@ import csv
 import time
 import numpy as np
 from deepface import DeepFace
+import requests
 
 
 def main():
@@ -27,12 +28,31 @@ def main():
 
     # --- HELPER ---
     def mark_attendance(name):
+        # ---- CSV WRITE (local backup) ----
         with open(attendance_file, "r") as f:
             existing = f.read()
         if name not in existing:
             with open(attendance_file, "a", newline="") as f:
                 writer = csv.writer(f)
                 writer.writerow([name, "Present"])
+
+        # ---- SEND TO SERVER ----
+        try:
+            user_res = requests.get(f"http://localhost:8000/getstudent/{name}")
+            if user_res.status_code == 200:
+                student_id = user_res.json()["id"]
+                response = requests.post(
+                    "http://localhost:8000/attendance",
+                    json={"student_id": student_id, "class_id": 1, "status": "present"}
+                )
+                if response.status_code == 200:
+                    print(f"✔ Attendance synced to server for {name}")
+                else:
+                    print(f"❌ Failed server sync: {response.text}")
+
+        except Exception as e:
+            print(f"❌ Error sending attendance to server: {e}")
+
 
     # --- LOAD MODEL ---
     print("Loading DeepFace model...")
