@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database.database import get_db
-from database.models import User, Schedule, Announcement, Attendance
+from database.models import User, Class, Schedule, Announcement, Attendance
 from datetime import datetime 
 from pydantic import BaseModel, EmailStr
 import uvicorn
@@ -303,6 +303,47 @@ def get_profile_by_id(user_id: int, db: Session = Depends(get_db)):
         "address": getattr(user, "address", None),
     }
 
+
+from datetime import datetime
+
+@app.get("/getclass/{user_id}")
+def get_current_class(user_id: int, db: Session = Depends(get_db)):
+    # Get user details
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Determine today's weekday
+    today = datetime.now().strftime("%A")
+
+    # Get current time in "HH:MM"
+    current_time = datetime.now().strftime("%H:%M")
+
+    # Query matching schedule row
+    schedule = db.query(Schedule).filter(
+        Schedule.day == today,
+        Schedule.course == user.course,
+        Schedule.semester == user.semester,
+        Schedule.time == current_time
+    ).first()
+
+    if not schedule:
+        return {"message": "No class right now", "current_class": None}
+
+    # Fetch class_code/class_id from Class table
+    class_info = db.query(Class).filter(Class.subject == schedule.subject).first()
+
+    return {
+        "message": "Current class found",
+        "current_class": {
+            "subject": schedule.subject,
+            "teacher": schedule.teacher,
+            "time": schedule.time,
+            "day": schedule.day,
+            "subject_code": class_info.subject_code if class_info else None,
+            "class_id": class_info.id if class_info else None
+        }
+    }
 
 
 
