@@ -1,22 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   SunIcon,
   MoonIcon,
   BellIcon,
-  ArrowLeftOnRectangleIcon, 
-  Bars3Icon, 
+  ArrowLeftOnRectangleIcon,
+  Bars3Icon,
 } from "@heroicons/react/24/outline";
 
 export default function Header({
   user,
   onLogout,
   onToggleTheme,
-  setActiveView, 
-  toggleSidebar, 
+  setActiveView,
+  toggleSidebar,
   darkMode,
 }) {
-  
-  const userName = user?.profile?.name || "User";
+
+  const [profile, setProfile] = useState(user);
+
+  useEffect(() => {
+    if (!user || !user.id) return;
+    if (profile && profile.fetched) return;
+    fetch(`http://localhost:8000/profile/id/${user.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setProfile(data)
+        localStorage.setItem("user", JSON.stringify(data))
+      })
+      .catch((err) => console.log(err))
+  }, [user.id])
+
 
   return (
     <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 sm:px-6 shadow-sm flex-shrink-0">
@@ -62,19 +75,19 @@ export default function Header({
           {/* Profile link */}
           <button
             onClick={() => setActiveView("profile")}
-            className="flex items-center space-x-2 rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center space-x-2 rounded-full p-1 pr-3 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <img
-              src={user?.profile?.imageUrl || `https://placehold.co/32x32/EFEFEF/3B82F6?text=${userName.charAt(0)}`}
+              src={profile?.profile_pic || `https://placehold.co/32x32/EFEFEF/3B82F6?text=${profile.name.charAt(0)}`}
               alt="Profile"
-              className="h-8 w-8 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
-              onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/32x32/EFEFEF/3B82F6?text=${userName.charAt(0)}` }}
+              className="h-10 w-10 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+              onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/32x32/EFEFEF/3B82F6?text=${profile.name.charAt(0)}` }}
             />
             <span className="hidden sm:block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {userName}
+              {profile.name}
             </span>
           </button>
-          
+
           {/* Logout Button */}
           <button
             onClick={onLogout}
