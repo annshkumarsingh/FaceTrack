@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, DateTime, Text, text
+from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, DateTime, Text, text ,Date
 from sqlalchemy.orm import relationship
 from .database import Base
 
@@ -89,3 +89,23 @@ class Announcement(Base):
     date = Column(String, nullable=False)  # Stored as YYYY-MM-DD string for simplicity
     created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
     updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))    
+
+
+class LeaveRequest(Base):
+    __tablename__ = "leave_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    student_name = Column(String, nullable=False)
+    student_email = Column(String, nullable=False)
+    teacher_name = Column(String, nullable=True)  # Teacher assigned to approve
+    from_date = Column(Date, nullable=False)
+    to_date = Column(Date, nullable=False)
+    reason = Column(Text, nullable=False)
+    document = Column(String, nullable=True)  # File path or name
+    status = Column(String, default="Pending")  # Pending, Approved, Rejected
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+    # Relationship
+    student = relationship("User", foreign_keys=[student_id])    

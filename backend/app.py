@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from database.database import get_db
-from database.models import User, Class, Schedule, Announcement, Attendance
+from database.models import User, Class, Schedule, Announcement, Attendance ,LeaveRequest
 from datetime import datetime 
 from pydantic import BaseModel, EmailStr
 import uvicorn
@@ -423,18 +423,31 @@ async def upload_schedule(file: UploadFile = File(...), db: Session = Depends(ge
 # ---------------------------
 @app.get("/schedule")
 def get_schedule(course: str | None = None, semester: str | None = None, db: Session = Depends(get_db)):
-    query = db.query(Schedule)
+    # Get all schedules
+    all_schedules = db.query(Schedule).all()
     
+    # Filter by course if provided
     if course:
-        query = query.filter(Schedule.course == course)
-    if semester:
-        query = query.filter(Schedule.semester == semester)
+        # Normalize the search term
+        search_term = course.replace(" ", "").replace("-", "").replace(".", "").lower()
+        
+        filtered_schedules = [
+            s for s in all_schedules
+            if s.course and search_term in s.course.replace(" ", "").replace("-", "").replace(".", "").lower()
+        ]
+    else:
+        filtered_schedules = all_schedules
     
-    schedules = query.all()
+    # Filter by semester if provided
+    if semester:
+        filtered_schedules = [
+            s for s in filtered_schedules
+            if s.semester and str(s.semester) == str(semester)
+        ]
     
     # Group by day
     schedule_by_day = {}
-    for item in schedules:
+    for item in filtered_schedules:
         day = item.day
         if day not in schedule_by_day:
             schedule_by_day[day] = []
@@ -580,6 +593,187 @@ def update_announcement(
     
     return existing
 
+
+
+
+
+class LeaveRequestCreate(BaseModel):
+    from_date: str  # YYYY-MM-DD format
+    to_date: str    # YYYY-MM-DD format
+    reason: str
+    teacher_name: str | None = None
+    document: str | None = None
+
+class LeaveRequestResponse(BaseModel):
+    id: int
+    student_id: int
+    student_name: str
+    student_email: str
+    teacher_name: str | None
+    from_date: str
+    to_date: str
+    reason: str
+    document: str | None
+    status: str
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# ---------------------------
+# CREATE LEAVE REQUEST
+# ---------------------------
+@app.post("/leave-requests")
+def create_leave_request(
+    request: LeaveRequestCreate,
+    student_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        # Get student details
+        student = db.query(User).filter(User.id == student_id).first()
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found")
+        
+        # Create leave request
+        new_request = LeaveRequest(
+            student_id=student_id,
+            student_name=student.full_name,
+            student_email=student.email,
+            teacher_name=request.teacher_name,
+            from_date=request.from_date,
+            to_date=request.to_date,
+            reason=request.reason,
+            document=request.document,
+            status="Pending"
+        )
+        
+        db.add(new_request)
+        db.commit()
+        db.refresh(new_request)
+        
+        return {
+            "message": "Leave request submitted successfully",
+            "request": {
+                "id": new_request.id,
+                "student_name": new_request.student_name,
+                "from_date": str(new_request.from_date),
+                "to_date": str(new_request.to_date),
+                "reason": new_request.reason,
+                "teacher_name": new_request.teacher_name,
+                "status": new_request.status
+            }
+        }
+    
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating leave request: {str(e)}")
+
+# ---------------------------
+# GET STUDENT'S LEAVE REQUESTS
+# ---------------------------
+@app.get("/leave-requests/student/{student_id}")
+def get_student_leave_requests(student_id: int, db: Session = Depends(get_db)):
+    requests = db.query(LeaveRequest).filter(
+        LeaveRequest.student_id == student_id
+    ).order_by(LeaveRequest.created_at.desc()).all()
+    
+    return [
+        {
+            "id": r.id,
+            "from": str(r.from_date),
+            "to": str(r.to_date),
+            "reason": r.reason,
+            "teacher_name": r.teacher_name,
+            "document": r.document or "No document",
+            "status": r.status,
+            "created_at": r.created_at
+        }
+        for r in requests
+    ]
+
+# ---------------------------
+# GET ALL LEAVE REQUESTS (Admin)
+# ---------------------------
+@app.get("/leave-requests")
+def get_all_leave_requests(status: str | None = None, db: Session = Depends(get_db)):
+    query = db.query(LeaveRequest)
+    
+    if status:
+        query = query.filter(LeaveRequest.status == status)
+    
+    requests = query.order_by(LeaveRequest.created_at.desc()).all()
+    
+    return [
+        {
+            "id": r.id,
+            "student_id": r.student_id,
+            "student_name": r.student_name,
+            "student_email": r.student_email,
+            "teacher_name": r.teacher_name,
+            "from": str(r.from_date),
+            "to": str(r.to_date),
+            "reason": r.reason,
+            "document": r.document,
+            "status": r.status,
+            "created_at": r.created_at
+        }
+        for r in requests
+    ]
+
+# ---------------------------
+# UPDATE LEAVE REQUEST STATUS (Admin)
+# ---------------------------
+@app.put("/leave-requests/{request_id}/status")
+def update_leave_status(
+    request_id: int,
+    status: str,
+    db: Session = Depends(get_db)
+):
+    if status not in ["Pending", "Approved", "Rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    leave_request = db.query(LeaveRequest).filter(LeaveRequest.id == request_id).first()
+    
+    if not leave_request:
+        raise HTTPException(status_code=404, detail="Leave request not found")
+    
+    leave_request.status = status
+    db.commit()
+    
+    return {"message": f"Leave request {status.lower()}", "status": status}
+
+# ---------------------------
+# DELETE LEAVE REQUEST
+# ---------------------------
+@app.delete("/leave-requests/{request_id}")
+def delete_leave_request(request_id: int, db: Session = Depends(get_db)):
+    leave_request = db.query(LeaveRequest).filter(LeaveRequest.id == request_id).first()
+    
+    if not leave_request:
+        raise HTTPException(status_code=404, detail="Leave request not found")
+    
+    db.delete(leave_request)
+    db.commit()
+    
+    return {"message": "Leave request deleted successfully"}
+
+# ---------------------------
+# GET AVAILABLE TEACHERS (for dropdown)
+# ---------------------------
+@app.get("/teachers")
+def get_teachers(db: Session = Depends(get_db)):
+    teachers = db.query(User).filter(User.role == "Admin").all()
+    
+    return [
+        {
+            "id": t.id,
+            "name": t.full_name,
+            "department": t.department,
+            "designation": t.designation
+        }
+        for t in teachers
+    ]
 
 
 

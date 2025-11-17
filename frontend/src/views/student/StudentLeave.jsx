@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { initialLeaveRequests } from "../../data/mockData.js";
+import React, { useState, useEffect } from "react";
 import {
   PaperClipIcon,
   ClockIcon,
@@ -9,9 +8,40 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function StudentLeave({ user }) {
-  const [requests, setRequests] = useState(initialLeaveRequests);
-  const [form, setForm] = useState({ from: "", to: "", reason: "" });
+  const [requests, setRequests] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [form, setForm] = useState({ from: "", to: "", reason: "", teacher_name: "" });
   const [document, setDocument] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchLeaveRequests();
+    fetchTeachers();
+  }, [user]);
+
+  const fetchLeaveRequests = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8000/leave-requests/student/${user.id}`);
+      const data = await response.json();
+      setRequests(data);
+    } catch (error) {
+      console.error("Error fetching leave requests:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTeachers = async () => {
+    try {
+      const response = await fetch("http://localhost:8000/teachers");
+      const data = await response.json();
+      setTeachers(data);
+    } catch (error) {
+      console.error("Error fetching teachers:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,28 +54,49 @@ export default function StudentLeave({ user }) {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.from || !form.to || !form.reason) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    const newRequest = {
-      id: requests.length + 1,
-      studentName: user.profile.name,
-      studentId: user.email, 
-      from: form.from,
-      to: form.to,
-      reason: form.reason,
-      status: "Pending",
-      document: document ? document.name : "No document",
-    };
+    setSubmitting(true);
 
-    setRequests([newRequest, ...requests]);
-    setForm({ from: "", to: "", reason: "" });
-    setDocument(null);
-    alert("Leave request submitted successfully!");
+    try {
+      const response = await fetch(
+        `http://localhost:8000/leave-requests?student_id=${user.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from_date: form.from,
+            to_date: form.to,
+            reason: form.reason,
+            teacher_name: form.teacher_name || null,
+            document: document ? document.name : null,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("✅ Leave request submitted successfully!");
+        setForm({ from: "", to: "", reason: "", teacher_name: "" });
+        setDocument(null);
+        fetchLeaveRequests(); // Refresh list
+      } else {
+        alert(`❌ Failed: ${data.detail}`);
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      alert("Network error. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const getStatusChip = (status) => {
@@ -93,37 +144,66 @@ export default function StudentLeave({ user }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">From Date <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              From Date <span className="text-red-500">*</span>
+            </label>
             <input
               type="date"
               name="from"
               value={form.from}
               onChange={handleChange}
               required
+              disabled={submitting}
               className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">To Date <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              To Date <span className="text-red-500">*</span>
+            </label>
             <input
               type="date"
               name="to"
               value={form.to}
               onChange={handleChange}
               required
+              disabled={submitting}
               className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Reason <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Assign to Teacher (Optional)
+          </label>
+          <select
+            name="teacher_name"
+            value={form.teacher_name}
+            onChange={handleChange}
+            disabled={submitting}
+            className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          >
+            <option value="">-- Select Teacher --</option>
+            {teachers.map((teacher) => (
+              <option key={teacher.id} value={teacher.name}>
+                {teacher.name} {teacher.department ? `(${teacher.department})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Reason <span className="text-red-500">*</span>
+          </label>
           <textarea
             name="reason"
             value={form.reason}
             onChange={handleChange}
             required
             rows="3"
+            disabled={submitting}
             placeholder="e.g., Attending a family function"
             className="mt-1 w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
@@ -134,19 +214,35 @@ export default function StudentLeave({ user }) {
             Upload Supporting Document
           </label>
           <div className="mt-1 flex items-center">
-            <label htmlFor="file-upload" className="cursor-pointer bg-white dark:bg-gray-700 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <label
+              htmlFor="file-upload"
+              className="cursor-pointer bg-white dark:bg-gray-700 py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
               <PaperClipIcon className="w-5 h-5 inline-block mr-2" />
               <span>{document ? document.name : "Attach a file"}</span>
             </label>
-            <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} />
+            <input
+              id="file-upload"
+              name="file-upload"
+              type="file"
+              className="sr-only"
+              onChange={handleFileChange}
+              disabled={submitting}
+            />
           </div>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">PDF, PNG, JPG up to 2MB.</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            PDF, PNG, JPG up to 2MB.
+          </p>
         </div>
 
         <div className="text-right">
-          <button type="submit" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <PlusIcon className="w-5 h-5 mr-2" />
-            Submit Request
+            {submitting ? "Submitting..." : "Submit Request"}
           </button>
         </div>
       </form>
@@ -156,28 +252,59 @@ export default function StudentLeave({ user }) {
         <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
           My Requests
         </h3>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Dates</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Reason</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Document</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {requests.map((request) => (
-                <tr key={request.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{request.from} to {request.to}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{request.reason}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{request.document}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{getStatusChip(request.status)}</td>
+
+        {loading ? (
+          <p className="text-gray-500 dark:text-gray-400">Loading requests...</p>
+        ) : requests.length === 0 ? (
+          <p className="text-gray-500 dark:text-gray-400 text-center py-4">
+            No leave requests yet.
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Dates
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Reason
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Teacher
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Document
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    Status
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {requests.map((request) => (
+                  <tr key={request.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                      {request.from} to {request.to}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                      {request.reason}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {request.teacher_name || "Not assigned"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {request.document}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {getStatusChip(request.status)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
