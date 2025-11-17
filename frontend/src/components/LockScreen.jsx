@@ -15,22 +15,6 @@ export default function LockScreen({ onLogin, onRegister, users }) {
     setView("resetForm");
   };
 
-  //Attendance system
-  const startAttendance = async () => {
-    try {
-      const res = await fetch("http://localhost:8000/start-attendance", {
-        method: "POST",
-      });
-      const data = await res.json();
-      console.log(data);
-      alert("Attendance system started!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to start attendance system");
-    }
-  };
-
-
 
   const RoleChoiceScreen = () => (
     <div className="text-center w-full">
@@ -65,11 +49,6 @@ export default function LockScreen({ onLogin, onRegister, users }) {
           Admin
         </button>
       </div>
-
-      {/*  start attendance currenlty simple setup wiull add subject with date later */}
-      <button onClick={startAttendance} className=" mt-6 w-full py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
-        Start Attendance
-      </button>
     </div>
   );
 
@@ -169,7 +148,7 @@ export default function LockScreen({ onLogin, onRegister, users }) {
 
       {/* Header */}
       <header className="backdrop-blur-md bg-white/20 dark:bg-gray-900/20 border-b border-white/30 dark:border-gray-700/30 shadow-lg sticky top-0 z-20">
-        <div className="container mx-auto flex items-center gap-6 py-4 px-6">
+        <div className="container mx-auto flex justify-center items-center gap-6 py-4 px-6">
           <div className="h-20 w-20 rounded-3xl overflow-hidden shadow-xl ring-2 ring-white/50 dark:ring-gray-700 flex-shrink-0">
             <img
               src="/YMCA_Logo.jpg"
@@ -182,7 +161,7 @@ export default function LockScreen({ onLogin, onRegister, users }) {
             <h1 className="text-3xl md:text-3xl font-medium tracking-tight drop-shadow-sm">
               J.C. Bose University of Science and Technology
             </h1>
-            <p className="md:text-lg text-base text-gray-700 dark:text-gray-300 font-normal tracking-wide">
+            <p className="md:text-xl font-medium text-center text-base text-gray-700 dark:text-gray-300 tracking-wide">
               YMCA, Faridabad
             </p>
           </div>
