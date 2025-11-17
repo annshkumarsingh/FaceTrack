@@ -5,6 +5,8 @@ export default function StudentProfile({ user, onLogout }) {
   const [profile, setProfile] = useState(user)
 
   useEffect(() => {
+    if (!user || !user.id) return;
+    if (profile && profile.fetched) return;
     fetch(`http://localhost:8000/profile/id/${user.id}`)
       .then((res) => res.json())
       .then((data) => {
