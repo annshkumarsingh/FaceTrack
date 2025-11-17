@@ -178,7 +178,7 @@ export default function App() {
       switch (activeView) {
         case "dashboard": return <StudentDashboard user={currentUser} />;
         case "profile": return <StudentProfile user={currentUser} onLogout={handleLogout} />;
-        case "schedule": return <StudentSchedule />;
+        case "schedule": return <StudentSchedule user={currentUser} />;
         case "attendance": return <StudentAttendance />;
         case "reports": return <StudentReports />;
         case "leave": return <StudentLeave user={currentUser}/>;
