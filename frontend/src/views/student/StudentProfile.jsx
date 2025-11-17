@@ -33,7 +33,7 @@ export default function StudentProfile({ user, onLogout }) {
       </h2>
 
       {/* Profile Card */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 flex flex-col md:flex-row gap-6">
+      <div className="bg-white dark:bg-gray-800 dark:text-gray-200 shadow rounded-lg p-6 flex flex-col md:flex-row gap-6">
         <div className="flex-shrink-0">
           <img
             src={profile.profile_pic}
