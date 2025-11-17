@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, DateTime, Text, text
 from sqlalchemy.orm import relationship
-from database.database import Base
+from .database import Base
 
 # ---------------------
 # USERS TABLE
@@ -38,6 +38,7 @@ class Class(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     subject = Column(String, nullable=False)
+    subject_code = Column(String, nullable=False)
     teacher_id = Column(Integer, ForeignKey("users.id"))
 
     # Relationships
