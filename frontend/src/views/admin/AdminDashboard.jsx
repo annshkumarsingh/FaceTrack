@@ -19,7 +19,8 @@ const getDashboardStats = () => {
 
 export default function AdminDashboard({ user, setActiveView }) {
 
-  const [currClass, setCurrClass] = useState({ name: "", subject_code: "" });
+  const [currClass, setCurrClass] = useState({ name: "" , subject_code: "" });
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getClass();
@@ -76,6 +77,8 @@ export default function AdminDashboard({ user, setActiveView }) {
 
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -142,24 +145,31 @@ export default function AdminDashboard({ user, setActiveView }) {
         </div>
       </div>
 
+      {/* Mark Attendance */}
       <div>
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
           Current Class:
         </h2>
 
         <div className="flex items-center gap-10 dark:text-gray-200">
-          {/* Fetch details about current class and display*/}
-          <div className="ml-10 mt-2">
-            <h3 className="text-lg font-medium">
-              {currClass.name}
-            </h3>
-            <p>
-              {currClass.subject_code}
-            </p>
-          </div>
+          {loading ?
+            (<p className="font-medium text-gray-500">Loading your current class... </p>)
+            :
+            (
+              <>
+                <div className="ml-10 mt-2"> 
+                  <h3 className="text-lg font-medium">
+                    {currClass.name}
+                  </h3>
+                  <p>
+                    {currClass.subject_code}
+                  </p>
+                </div>
+              </>
+            )}
           {/* Start the attendance of the current class */}
-          <button onClick={startAttendance} disabled={currClass.name==""} className="w-[250px] py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
-            Mark Attendance
+          <button onClick={startAttendance} disabled={loading} className="w-[250px] py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
+            Start Attendance
           </button>
         </div>
       </div>
