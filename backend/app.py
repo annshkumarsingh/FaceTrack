@@ -61,6 +61,9 @@ class ScheduleItem(BaseModel):
     course: str | None = None
     semester: str | None = None
 
+class UserUpdate(BaseModel):
+    phone: str | None = None
+
 class AttendanceCreate(BaseModel):
     student_id: int
     class_id: int
@@ -188,11 +191,11 @@ def get_attendance(db: Session = Depends(get_db)):
     ]
 
 # --------------------------- 
-# GET STUDENT BY NAME
+# GET STUDENT BY ROLL NUMBER
 # --------------------------- 
-@app.get("/getstudent/{name}")
-def get_student(name: str, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.full_name == name).first()
+@app.get("/getstudent/rollnum/{roll_num}")
+def get_student(roll_num: str, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.roll_number == roll_num).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"id": user.id, "name": user.full_name}
@@ -304,8 +307,42 @@ def get_profile_by_id(user_id: int, db: Session = Depends(get_db)):
     }
 
 
-from datetime import datetime
+# ---------------------------
+# UPDATE USER PROFILE
+# ---------------------------
+@app.put("/profile/id/{user_id}")
+def update_profile(user_id: int, update: UserUpdate, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
+    # Update fields if provided
+    if update.phone is not None:
+        user.phone = update.phone
+
+    db.commit() 
+    db.refresh(user)
+
+    return {
+        "id": user.id,
+        "name": user.full_name,
+        "email": user.email,
+        "roll_number": user.roll_number,
+        "course": user.course,
+        "semester": user.semester,
+        "phone": user.phone,
+        "department": getattr(user, "department", None),
+        "designation": getattr(user, "designation", None),
+        "profile_pic": user.profile_pic,
+        "role": user.role,
+        "college": getattr(user, "college", "YMCA"),
+        "address": getattr(user, "address", None),
+    }
+
+
+# ---------------------------
+# GET CLASS
+# ---------------------------
 @app.get("/getclass/{user_id}")
 def get_current_class(user_id: int, db: Session = Depends(get_db)):
     # Get user details
@@ -511,7 +548,6 @@ class AnnouncementResponse(BaseModel):
     class Config:
         from_attributes = True
 
-# ... your existing routes ...
 
 # ---------------------------
 # CREATE ANNOUNCEMENT
