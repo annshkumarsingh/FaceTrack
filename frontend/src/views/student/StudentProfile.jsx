@@ -21,10 +21,29 @@ export default function StudentProfile({ user, onLogout }) {
     setProfile((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSave = () => {
-    setEditing(false)
-    alert("Profile updated locally (not saved to server in this prototype).")
+  const handleSave = async () => {
+  try {
+    const response = await fetch(`http://localhost:8000/profile/id/${user.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: profile.phone,
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to update profile");
+
+    const updatedProfile = await response.json();
+    setProfile(updatedProfile);
+    localStorage.setItem("user", JSON.stringify(updatedProfile));
+    setEditing(false);
+    alert("Profile updated successfully!");
+  } catch (err) {
+    console.error(err);
+    alert("Error updating profile.");
   }
+};
+
 
   return (
     <div className="p-6 space-y-6">
@@ -64,26 +83,12 @@ export default function StudentProfile({ user, onLogout }) {
               <input
                 type="tel"
                 name="phone"
-                value={profile.phone}
+                value={profile.phone || ""}
                 onChange={handleChange}
                 className="input-field w-48"
               />
             ) : (
               profile.phone
-            )}
-          </p>
-          <p>
-            <strong>Address:</strong>{" "}
-            {editing ? (
-              <input
-                type="text"
-                name="address"
-                value={profile.address}
-                onChange={handleChange}
-                className="input-field w-64"
-              />
-            ) : (
-              profile.address || "Not set"
             )}
           </p>
 

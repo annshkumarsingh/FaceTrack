@@ -43,7 +43,7 @@ export default function Sidebar({
         (isSidebarOpen ? "w-64" : "w-0")
       }
     >
-      <div className="h-16 flex items-center justify-center px-4 font-bold text-lg border-b border-gray-700 whitespace-nowrap">
+      <div className="h-16 flex items-center justify-center px-4 font-bold text-xl border-b border-gray-700 whitespace-nowrap">
         <span>FaceTrack</span>
       </div>
       <nav className="flex-1 p-2 space-y-1">

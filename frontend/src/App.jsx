@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Components & Views
@@ -32,6 +32,13 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setCurrentUser(JSON.parse(savedUser));
+    }
+  }, []);
+
   const handleLogin = async (email, password, role) => {
     try {
       const response = await fetch('http://localhost:8000/login', {
@@ -44,24 +51,30 @@ export default function App() {
           password: password
         })
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         // Check if user role matches the selected role
         if (data.user.role === role) {
-          setCurrentUser({
+          const userData = {
             ...data.user,
             email: data.user.email,
             name: data.user.name,
             role: data.user.role,
             roll_number: data.user.roll_number,
             course: data.user.course,
-            semester: data.user.semester
-          });
+            semester: data.user.semester,
+            id: data.user.id
+          };
+          setCurrentUser(userData);
+
+          localStorage.setItem("user", JSON.stringify(userData));
+
           setActiveView("dashboard");
           return true;
-        } else {
+        }
+        else {
           alert(`Invalid role. User is registered as ${data.user.role}`);
           return false;
         }
@@ -75,45 +88,48 @@ export default function App() {
       return false;
     }
   };
-  
 
-  const handleRegister =async (email, newUser) => {
-        
+
+  const handleRegister = async (email, newUser) => {
+
     try {
       const response = await fetch("http://localhost:8000/register", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-              fullName: newUser.fullName,
-              rollNumber: newUser.rollNumber,
-              course: newUser.course,
-              semester: newUser.semester,
-              phone: newUser.phone,
-              email: email,
-              password: newUser.password,
-              profilePic: newUser.profilePic,
-              role: newUser.role,
-              designation:newUser.designation,
-              department:newUser.department
-          }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: newUser.fullName,
+          rollNumber: newUser.rollNumber,
+          course: newUser.course,
+          semester: newUser.semester,
+          phone: newUser.phone,
+          email: email,
+          password: newUser.password,
+          profilePic: newUser.profilePic,
+          role: newUser.role,
+          designation: newUser.designation,
+          department: newUser.department
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-          alert(data.detail || "Registration failed!");
-          return;
+        alert(data.detail || "Registration failed!");
+        return;
       }
 
       alert("✅ Registration successful!");
       setCurrentUser(data.user);
+
+      localStorage.setItem("user", JSON.stringify(data.user));
+
       setActiveView("dashboard");
-  } catch (error) {
+    } catch (error) {
       alert("Registration failed!");
       return;
-  }
+    }
 
 
 
@@ -126,10 +142,11 @@ export default function App() {
     //   ...prevUsers,
     //   [email]: userWithEmail,
     // }));
-   
+
   };
 
   const handleLogout = () => {
+    localStorage.removeItem("user");
     setCurrentUser(null);
   };
 
@@ -181,7 +198,7 @@ export default function App() {
         case "schedule": return <StudentSchedule user={currentUser} />;
         case "attendance": return <StudentAttendance />;
         case "reports": return <StudentReports />;
-        case "leave": return <StudentLeave user={currentUser}/>;
+        case "leave": return <StudentLeave user={currentUser} />;
         default: return <StudentDashboard user={currentUser} />;
       }
     }

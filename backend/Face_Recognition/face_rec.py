@@ -27,32 +27,49 @@ def main():
             writer.writerow(["Name", "Status"])
 
     # --- HELPER ---
-    def mark_attendance(name):
-        # ---- CSV WRITE (local backup) ----
-        with open(attendance_file, "r") as f:
-            existing = f.read()
-        if name not in existing:
-            with open(attendance_file, "a", newline="") as f:
-                writer = csv.writer(f)
-                writer.writerow([name, "Present"])
+    def mark_attendance(roll_no):
+        if not roll_no:
+            return
 
-        # ---- SEND TO SERVER ----
         try:
-            user_res = requests.get(f"http://localhost:8000/getstudent/{name}")
+            # Get student by roll number
+            user_res = requests.get(f"http://localhost:8000/getstudent/rollnum/{roll_no}")
             if user_res.status_code == 200:
-                student_id = user_res.json()["id"]
+                student = user_res.json()
+                student_id = student["id"]
+                student_name = student["name"]
+
+                # CSV write (local backup)
+                with open(attendance_file, "r") as f:
+                    existing = f.read()
+                if student_name not in existing:
+                    with open(attendance_file, "a", newline="") as f:
+                        writer = csv.writer(f)
+                        writer.writerow([student_name, "Present"])
+
+                # Send attendance to server
                 response = requests.post(
                     "http://localhost:8000/attendance",
                     json={"student_id": student_id, "class_id": 1, "status": "present"}
                 )
                 if response.status_code == 200:
-                    print(f"✔ Attendance synced to server for {name}")
+                    print(f"✔ Attendance synced to server for {student_name}")
                 else:
                     print(f"❌ Failed server sync: {response.text}")
+            else:
+                print(f"❌ Student not found for roll number {roll_no}")
 
         except Exception as e:
             print(f"❌ Error sending attendance to server: {e}")
 
+
+    # --- EXTRACT ROLL NO FROM FILENAME ---
+    def extract_roll_number(filename):
+        start = filename.find("(")
+        end = filename.rfind(")")
+        if start != -1 and end != -1:
+            return filename[start+1:end]
+        return None
 
     # --- LOAD MODEL ---
     print("Loading DeepFace model...")
@@ -108,7 +125,8 @@ def main():
 
                     if min_dist < threshold:
                         recognized_name = f"{identity} (Present)"
-                        mark_attendance(identity)
+                        roll_no = extract_roll_number(identity)
+                        mark_attendance(roll_no)
                     else:
                         recognized_name = "Unknown"
                 else:

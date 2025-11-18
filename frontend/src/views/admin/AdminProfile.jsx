@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BriefcaseIcon,
   BuildingOffice2Icon,
@@ -10,31 +10,46 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function AdminProfile({ user, onLogout }) {
+
+  const [profile, setProfile] = useState(user);
+
+  useEffect(() => {
+      if (!user || !user.id) return;
+      if (profile && profile.fetched) return;
+      fetch(`http://localhost:8000/profile/id/${user.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setProfile(data)
+          localStorage.setItem("user", JSON.stringify(data))
+        })
+        .catch((err) => console.log(err))
+    }, [user.id])
+
   const adminDetails = [
     {
       label: "Designation",
-      value: user?.profile?.designation || "Not Available",
+      value: profile?.designation || "Not Available",
       icon: BriefcaseIcon,
     },
     {
       label: "Department",
-      value: user?.profile?.department || "Not Available",
+      value: profile?.department || "Not Available",
       icon: BuildingOffice2Icon,
     },
     { label: "Email", value: user?.email || "Not Available", icon: EnvelopeIcon },
     {
       label: "Phone",
-      value: user?.profile?.phone || "Not Available",
+      value: profile?.phone || "Not Available",
       icon: PhoneIcon,
     },
     {
       label: "Date of Birth",
-      value: user?.profile?.dob || "Not Available",
+      value: profile?.dob || "Not Available",
       icon: CakeIcon,
     },
   ];
 
-  const adminName = user?.profile?.name || "Admin User";
+  const adminName = profile?.name || "Admin User";
 
   return (
     <div className="p-4 sm:p-6 space-y-6">
@@ -45,7 +60,7 @@ export default function AdminProfile({ user, onLogout }) {
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
           <img
-            src={user?.profile?.imageUrl || `https://placehold.co/128x128/EFEFEF/3B82F6?text=${adminName.charAt(0)}`}
+            src={profile?.profile_pic || `https://placehold.co/128x128/EFEFEF/3B82F6?text=${adminName.charAt(0)}`}
             alt="Admin Profile"
             className="h-32 w-32 rounded-full object-cover border-4 border-blue-500 shadow-md"
             onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/128x128/EFEFEF/3B82F6?text=${adminName.charAt(0)}` }}
