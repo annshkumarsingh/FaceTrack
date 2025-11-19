@@ -65,6 +65,7 @@ export default function AdminDashboard({ user, setActiveView }) {
     try {
       const res = await fetch(`http://localhost:8000/getclass/${user.id}`);
       const data = await res.json();
+      console.log(data)
 
       if (data.current_class) {
         setCurrClass({
