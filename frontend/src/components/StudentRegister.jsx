@@ -67,6 +67,19 @@ const StudentRegister = ({ onBack, onRegister }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const COURSES = [
+    "B.Tech - ECE",
+    "B.Tech - ENC",
+    "B.Tech - CE",
+    "B.Tech - IT",
+    "B.Tech - Civil",
+    "M.Tech - ECE",
+    "M.Tech - CE",
+  ];
+
+  const SEMESTERS = ["1", "2", "3", "4", "5", "6", "7", "8"];
+
+
   const validatePassword = (pwd) =>
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(pwd);
 
@@ -118,8 +131,7 @@ const StudentRegister = ({ onBack, onRegister }) => {
   };
 
   const getInputClass = (fieldName) =>
-    `w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 transition duration-200 ${
-      errors[fieldName] ? "border-red-500 ring-red-500" : "border-gray-300"
+    `w-full border rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500 transition duration-200 ${errors[fieldName] ? "border-red-500 ring-red-500" : "border-gray-300"
     }`;
 
   return (
@@ -199,32 +211,44 @@ const StudentRegister = ({ onBack, onRegister }) => {
             <label className="block font-semibold text-gray-600 dark:text-gray-300 mb-1">
               Course <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              placeholder="e.g. B.Tech CSE"
+            <select
               className={getInputClass("course")}
               value={form.course}
               onChange={(e) => setForm({ ...form, course: e.target.value })}
-            />
+            >
+              <option value="">Select course</option>
+              {COURSES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
             {errors.course && (
               <p className="text-red-500 text-sm mt-1">{errors.course}</p>
             )}
           </div>
+
           <div>
             <label className="block font-semibold text-gray-600 dark:text-gray-300 mb-1">
               Semester <span className="text-red-500">*</span>
             </label>
-            <input
-              type="number"
-              placeholder="e.g. 7"
+            <select
               className={getInputClass("semester")}
               value={form.semester}
               onChange={(e) => setForm({ ...form, semester: e.target.value })}
-            />
+            >
+              <option value="">Select semester</option>
+              {SEMESTERS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
+            </select>
             {errors.semester && (
               <p className="text-red-500 text-sm mt-1">{errors.semester}</p>
             )}
           </div>
+
         </div>
 
         <div>
