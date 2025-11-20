@@ -64,6 +64,10 @@ class ScheduleItem(BaseModel):
 class UserUpdate(BaseModel):
     phone: str | None = None
 
+class AttendanceStartRequest(BaseModel):
+    course: str
+    semester: str
+
 class AttendanceCreate(BaseModel):
     student_id: int
     class_id: int
@@ -117,7 +121,7 @@ def home():
 # START ATTENDANCE
 # ---------------------------
 @app.post("/start-attendance")
-def start_attendance():
+def start_attendance(payload: AttendanceStartRequest):
     try:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         script_path = os.path.join(base_dir, "Face_Recognition", "face_rec.py")
@@ -131,7 +135,7 @@ def start_attendance():
         print(f"Running: {script_path}")
         print(f"Python path: {python_executable}")
 
-        subprocess.Popen([python_executable, script_path])
+        subprocess.Popen([python_executable, script_path, payload.course, payload.semester])
         return JSONResponse(content={"status": "started", "message": "Attendance system launched"})
 
     except Exception as e:
@@ -343,44 +347,42 @@ def update_profile(user_id: int, update: UserUpdate, db: Session = Depends(get_d
 # ---------------------------
 # GET CLASS
 # ---------------------------
-@app.get("/getclass/{user_id}")
+@app.get("/getclasses/{user_id}")
 def get_current_class(user_id: int, db: Session = Depends(get_db)):
-    # Get user details
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+
+    # Step 1: Get the teacher name from the ID
+    teacher = db.query(User).filter(User.id == user_id, User.role == "Admin").first()
+    if not teacher:
+        raise HTTPException(status_code=404, detail="Teacher not found")
+    
+    teacher_name = teacher.full_name
 
     # Determine today's weekday
     today = datetime.now().strftime("%A")
 
-    # Get current time in "HH:MM"
-    current_time = datetime.now().strftime("%H:%M")
-
     # Query matching schedule row
     schedule = db.query(Schedule).filter(
+        Schedule.teacher == teacher_name,
         Schedule.day == today,
-        Schedule.course == user.course,
-        Schedule.semester == user.semester,
-        Schedule.time == current_time
-    ).first()
+    ).all()
 
     if not schedule:
         return {"message": "No class right now", "current_class": None}
 
-    # Fetch class_code/class_id from Class table
-    class_info = db.query(Class).filter(Class.subject == schedule.subject).first()
-
-    return {
-        "message": "Current class found",
-        "current_class": {
-            "subject": schedule.subject,
-            "teacher": schedule.teacher,
-            "time": schedule.time,
-            "day": schedule.day,
-            "subject_code": class_info.subject_code if class_info else None,
-            "class_id": class_info.id if class_info else None
+    classes = [
+        {
+            "id": s.id,
+            "subject": s.subject,
+            "teacher": s.teacher,
+            "time": s.time,
+            "day": s.day,
+            "course": s.course,
+            "semester": s.semester,
         }
-    }
+        for s in schedule
+    ]
+
+    return {"classes": classes}
 
 
 

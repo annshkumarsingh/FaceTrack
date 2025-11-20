@@ -2,6 +2,7 @@ import cv2
 import os
 import csv
 import time
+import sys
 import numpy as np
 from deepface import DeepFace
 import requests
@@ -10,7 +11,19 @@ import requests
 def main():
     # --- PATHS ---
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    faces_dir = os.path.join(BASE_DIR, "Faces")
+    if len(sys.argv) < 3:
+        print("❌ Course & Semester not provided!")
+        return
+
+    course = sys.argv[1]
+    semester = sys.argv[2]
+    print(course,semester)
+    faces_dir = os.path.join(BASE_DIR, "Faces", course, semester)
+    print(faces_dir)
+    if not os.path.exists(faces_dir):
+        os.makedirs(faces_dir)
+        print(f"Created folder: {faces_dir}. Please add student images here.")
+
     attendance_file = os.path.join(BASE_DIR, "attendance.csv")
 
     model_name = "Facenet"

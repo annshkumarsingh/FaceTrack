@@ -7,25 +7,74 @@ import {
 } from "@heroicons/react/24/outline";
 import { initialLeaveRequests, initialUsers } from "../../data/mockData.js";
 
-const getDashboardStats = () => {
-  const pendingLeaves = initialLeaveRequests.filter(
-    (req) => req.status === "Pending"
-  ).length;
-  const totalStudents = Object.values(initialUsers).filter(
-    (user) => user.role === "Student"
-  ).length;
-  return { pendingLeaves, totalStudents };
-};
-
 export default function AdminDashboard({ user, setActiveView }) {
+  const [todayClasses, setTodayClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [currClass, setCurrClass] = useState({ name: "" , subject_code: "" });
-  const [loading, setLoading] = useState(true)
+  // Fetch today's classes for the teacher
+  const fetchTodayClasses = async () => {
+    try {
+      const res = await fetch(`http://localhost:8000/getclasses/${user.id}`);
+      const data = await res.json();
+      setTodayClasses(data.classes || []);
+      if (data.classes && data.classes.length > 0) {
+        let currClass = null;
+        for (let i = 0; i < data.classes.length; i++) {
+          // Convert the fetched time to valid date-time format
+          const class_start_hour = parseInt(data.classes[i].time.slice(0, 2));
+          const class_end_hour = class_start_hour + 1;
+          const class_start_minutes = data.classes[i].time.slice(3, 5)
+
+          // Fetch current date-time value
+          const now = new Date();
+          const now_hour = parseInt(now.getHours());
+          const now_minutes = parseInt(now.getMinutes());
+          
+          if ((now_hour > class_start_hour || (now_hour==class_start_hour && now_minutes>=class_start_minutes)) && now_hour < class_end_hour) currClass = data.classes[i]
+        }
+        if (!selectedClass) setSelectedClass(currClass || data.classes[0]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getClass();
+    fetchTodayClasses();
   }, []);
 
+  // Attendance system
+  const startAttendance = async () => {
+    if (!selectedClass) {
+      alert("Please select a class first!");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:8000/start-attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ course: selectedClass.course, semester: selectedClass.semester }),
+      });
+      const data = await res.json();
+      alert("Attendance system started!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to start attendance system");
+    }
+  };
+
+  const getDashboardStats = () => {
+    const pendingLeaves = initialLeaveRequests.filter(
+      (req) => req.status === "Pending"
+    ).length;
+    const totalStudents = Object.values(initialUsers).filter(
+      (user) => user.role === "Student"
+    ).length;
+    return { pendingLeaves, totalStudents };
+  };
   const stats = getDashboardStats();
   const adminName = user?.name || "Admin";
 
@@ -60,46 +109,6 @@ export default function AdminDashboard({ user, setActiveView }) {
     },
   ];
 
-
-  const getClass = async () => {
-    try {
-      const res = await fetch(`http://localhost:8000/getclass/${user.id}`);
-      const data = await res.json();
-      console.log(data)
-
-      if (data.current_class) {
-        setCurrClass({
-          name: data.current_class.subject,
-          subject_code: data.current_class.subject_code,
-        });
-      } else {
-        setCurrClass({ name: "No class right now", subject_code: "" });
-      }
-
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  //Attendance system
-  const startAttendance = async () => {
-    try {
-      const res = await fetch("http://localhost:8000/start-attendance", {
-        method: "POST",
-      });
-      const data = await res.json();
-      console.log(data);
-      alert("Attendance system started!");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to start attendance system");
-    }
-  };
-
-
-
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
@@ -125,7 +134,7 @@ export default function AdminDashboard({ user, setActiveView }) {
         ))}
       </div>
 
-      {/* "Quick Actions" */}
+      {/* Quick Actions */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
           Quick Actions
@@ -148,34 +157,45 @@ export default function AdminDashboard({ user, setActiveView }) {
 
       {/* Mark Attendance */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-          Current Class:
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+          Classes for Today:
         </h2>
 
-        <div className="flex items-center gap-10 dark:text-gray-200">
-          {loading ?
-            (<p className="font-medium text-gray-500">Loading your current class... </p>)
-            :
-            (
-              <>
-                <div className="ml-10 mt-2"> 
-                  <h3 className="text-lg font-medium">
-                    {currClass.name}
-                  </h3>
-                  <p>
-                    {currClass.subject_code}
-                  </p>
-                </div>
-              </>
-            )}
-          {/* Start the attendance of the current class */}
-          <button onClick={startAttendance} disabled={loading} className="w-[250px] py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity">
-            Start Attendance
-          </button>
-        </div>
-      </div>
+        {loading ? (
+          <p className="font-medium text-gray-500">
+            Loading your classes for today...
+          </p>
+        ) : todayClasses.length === 0 ? (
+          <p className="font-medium text-gray-500">
+            No classes scheduled for today.
+          </p>
+        ) : (
+          <div className="flex items-center gap-6">
+            <select
+              value={selectedClass?.id || ""}
+              onChange={(e) => {
+                const cls = todayClasses.find(c => c.id === parseInt(e.target.value));
+                setSelectedClass(cls);
+              }}
 
+              className="p-2 rounded-lg border dark:bg-gray-700 dark:text-gray-200"
+            >
+              {todayClasses.map((cls) => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.subject} ({cls.time})
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={startAttendance}
+              className="w-[250px] py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity"
+            >
+              Start Attendance
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-

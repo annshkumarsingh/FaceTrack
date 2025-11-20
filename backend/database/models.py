@@ -62,7 +62,6 @@ class Attendance(Base):
     student = relationship("User", back_populates="attendance_records")
     class_ = relationship("Class", back_populates="attendance_records")
 
-# ... your existing models ...
 
 # ---------------------
 # SCHEDULE TABLE
