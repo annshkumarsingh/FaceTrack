@@ -4,6 +4,8 @@ export default function StudentSchedule({ user }) {
   const [schedule, setSchedule] = useState({});
   const [loading, setLoading] = useState(true);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   useEffect(() => {
     fetchSchedule();
   }, [user]);
@@ -13,7 +15,7 @@ export default function StudentSchedule({ user }) {
     try {
       // Fetch schedule filtered by user's course and semester
       const response = await fetch(
-        `http://localhost:8000/schedule?course=${encodeURIComponent(user.course)}&semester=${user.semester}`
+        `${backend_url}/schedule?course=${encodeURIComponent(user.course)}&semester=${user.semester}`
       );
       const data = await response.json();
       setSchedule(data);

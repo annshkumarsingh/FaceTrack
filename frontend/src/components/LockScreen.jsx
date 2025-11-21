@@ -19,7 +19,7 @@ export default function LockScreen({ onLogin, onRegister, users }) {
   const RoleChoiceScreen = () => (
     <div className="text-center w-full">
       <img
-        src="/public/FaceTrack_Logo.png"
+        src="/FaceTrack_Logo.png"
         alt="FaceTrack Logo"
         className="h-24 w-24 mx-auto mb-4"
       />

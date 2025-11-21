@@ -5,6 +5,8 @@ export default function StudentDashboard({ user }) {
   const [announcements, setAnnouncements] = useState([]);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   // Fetch announcements from backend
   useEffect(() => {
     fetchAnnouncements();
@@ -13,7 +15,7 @@ export default function StudentDashboard({ user }) {
   const fetchAnnouncements = async () => {
     setLoadingAnnouncements(true);
     try {
-      const response = await fetch("http://localhost:8000/announcements");
+      const response = await fetch(`${backend_url}/announcements`);
       const data = await response.json();
       setAnnouncements(data);
     } catch (error) {

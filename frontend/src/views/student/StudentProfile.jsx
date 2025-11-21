@@ -4,10 +4,12 @@ export default function StudentProfile({ user, onLogout }) {
   const [editing, setEditing] = useState(false)
   const [profile, setProfile] = useState(user)
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   useEffect(() => {
     if (!user || !user.id) return;
     if (profile && profile.fetched) return;
-    fetch(`http://localhost:8000/profile/id/${user.id}`)
+    fetch(`${backend_url}/profile/id/${user.id}`)
       .then((res) => res.json())
       .then((data) => {
         setProfile(data)
@@ -23,7 +25,7 @@ export default function StudentProfile({ user, onLogout }) {
 
   const handleSave = async () => {
   try {
-    const response = await fetch(`http://localhost:8000/profile/id/${user.id}`, {
+    const response = await fetch(`${backend_url}/profile/id/${user.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

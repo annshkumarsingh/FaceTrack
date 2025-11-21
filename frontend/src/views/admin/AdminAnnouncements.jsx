@@ -9,6 +9,8 @@ export default function AdminAnnouncements() {
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   // Fetch announcements on component mount
   useEffect(() => {
     fetchAnnouncements();
@@ -17,7 +19,7 @@ export default function AdminAnnouncements() {
   const fetchAnnouncements = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/announcements");
+      const response = await fetch(`${backend_url}/announcements`);
       const data = await response.json();
       setAnnouncements(data);
     } catch (error) {
@@ -37,7 +39,7 @@ export default function AdminAnnouncements() {
     setPosting(true);
 
     try {
-      const response = await fetch("http://localhost:8000/announcements", {
+      const response = await fetch(`${backend_url}/announcements`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

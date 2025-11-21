@@ -16,6 +16,11 @@ import io
 from PIL import Image
 import pytesseract
 from typing import List
+from dotenv import load_dotenv
+
+load_dotenv()
+
+backend_url = os.getenv("BACKEND_URL")
 
 app = FastAPI()
 

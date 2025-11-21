@@ -12,10 +12,12 @@ export default function AdminDashboard({ user, setActiveView }) {
   const [selectedClass, setSelectedClass] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   // Fetch today's classes for the teacher
   const fetchTodayClasses = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/getclasses/${user.id}`);
+      const res = await fetch(`${backend_url}/getclasses/${user.id}`);
       const data = await res.json();
       setTodayClasses(data.classes || []);
       if (data.classes && data.classes.length > 0) {
@@ -53,7 +55,7 @@ export default function AdminDashboard({ user, setActiveView }) {
       return;
     }
     try {
-      const res = await fetch("http://localhost:8000/start-attendance", {
+      const res = await fetch(`${backend_url}/start-attendance`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ course: selectedClass.course, semester: selectedClass.semester }),

@@ -13,10 +13,12 @@ export default function AdminProfile({ user, onLogout }) {
 
   const [profile, setProfile] = useState(user);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   useEffect(() => {
       if (!user || !user.id) return;
       if (profile && profile.fetched) return;
-      fetch(`http://localhost:8000/profile/id/${user.id}`)
+      fetch(`${backend_url}/profile/id/${user.id}`)
         .then((res) => res.json())
         .then((data) => {
           setProfile(data)

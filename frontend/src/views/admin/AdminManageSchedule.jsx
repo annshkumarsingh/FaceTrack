@@ -13,6 +13,8 @@ export default function AdminManageSchedule() {
   const [loading, setLoading] = useState(true);
   const [extractedText, setExtractedText] = useState("");
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   useEffect(() => {
     fetchSchedule();
   }, []);
@@ -20,7 +22,7 @@ export default function AdminManageSchedule() {
   const fetchSchedule = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/schedule");
+      const response = await fetch(`${backend_url}/schedule`);
       const data = await response.json();
       setSchedule(data);
     } catch (error) {
@@ -43,7 +45,7 @@ export default function AdminManageSchedule() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("http://localhost:8000/upload-schedule", {
+      const response = await fetch(`${backend_url}/upload-schedule`, {
         method: "POST",
         body: formData,
       });
@@ -76,7 +78,7 @@ export default function AdminManageSchedule() {
     if (!confirm("Are you sure you want to delete all schedules?")) return;
 
     try {
-      const response = await fetch("http://localhost:8000/schedule", {
+      const response = await fetch(`${backend_url}/schedule`, {
         method: "DELETE",
       });
 

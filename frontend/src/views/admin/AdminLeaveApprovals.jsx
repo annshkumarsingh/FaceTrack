@@ -12,6 +12,8 @@ export default function AdminLeaveApprovals() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all"); // all, pending, approved, rejected
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   useEffect(() => {
     fetchLeaveRequests();
   }, [filter]);
@@ -20,7 +22,7 @@ export default function AdminLeaveApprovals() {
     setLoading(true);
     try {
       // Build URL with optional status filter
-      let url = "http://localhost:8000/leave-requests";
+      let url = `${backend_url}/leave-requests`;
       if (filter !== "all") {
         url += `?status=${filter.charAt(0).toUpperCase() + filter.slice(1)}`;
       }
@@ -38,7 +40,7 @@ export default function AdminLeaveApprovals() {
   const updateStatus = async (id, status) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/leave-requests/${id}/status?status=${status}`,
+        `${backend_url}/leave-requests/${id}/status?status=${status}`,
         {
           method: "PUT",
         }

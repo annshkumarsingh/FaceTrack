@@ -32,6 +32,8 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000"
+
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
@@ -41,7 +43,7 @@ export default function App() {
 
   const handleLogin = async (email, password, role) => {
     try {
-      const response = await fetch('http://localhost:8000/login', {
+      const response = await fetch(`${backend_url}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -93,7 +95,7 @@ export default function App() {
   const handleRegister = async (email, newUser) => {
 
     try {
-      const response = await fetch("http://localhost:8000/register", {
+      const response = await fetch(`${backend_url}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

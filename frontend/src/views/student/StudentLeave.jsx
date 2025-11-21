@@ -15,6 +15,8 @@ export default function StudentLeave({ user }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL
+
   useEffect(() => {
     fetchLeaveRequests();
     fetchTeachers();
@@ -23,7 +25,7 @@ export default function StudentLeave({ user }) {
   const fetchLeaveRequests = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/leave-requests/student/${user.id}`);
+      const response = await fetch(`${backend_url}/leave-requests/student/${user.id}`);
       const data = await response.json();
       setRequests(data);
     } catch (error) {
@@ -35,7 +37,7 @@ export default function StudentLeave({ user }) {
 
   const fetchTeachers = async () => {
     try {
-      const response = await fetch("http://localhost:8000/teachers");
+      const response = await fetch(`${backend_url}/teachers`);
       const data = await response.json();
       setTeachers(data);
     } catch (error) {
@@ -65,7 +67,7 @@ export default function StudentLeave({ user }) {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/leave-requests?student_id=${user.id}`,
+        `${backend_url}/leave-requests?student_id=${user.id}`,
         {
           method: "POST",
           headers: {

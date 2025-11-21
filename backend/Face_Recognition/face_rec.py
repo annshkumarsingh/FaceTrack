@@ -7,6 +7,8 @@ import numpy as np
 from deepface import DeepFace
 import requests
 
+backend_url = os.getenv("BACKEND_URL")
+
 
 def main():
     # --- PATHS ---
@@ -46,7 +48,7 @@ def main():
 
         try:
             # Get student by roll number
-            user_res = requests.get(f"http://localhost:8000/getstudent/rollnum/{roll_no}")
+            user_res = requests.get(f"{backend_url}/getstudent/rollnum/{roll_no}")
             if user_res.status_code == 200:
                 student = user_res.json()
                 student_id = student["id"]
@@ -62,7 +64,7 @@ def main():
 
                 # Send attendance to server
                 response = requests.post(
-                    "http://localhost:8000/attendance",
+                    f"{backend_url}/attendance",
                     json={"student_id": student_id, "class_id": 1, "status": "present"}
                 )
                 if response.status_code == 200:
