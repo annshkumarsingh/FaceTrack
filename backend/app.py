@@ -2,9 +2,10 @@ from fastapi import FastAPI, Depends, HTTPException, File, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from database.database import get_db
 from database.models import User, Class, Schedule, Announcement, Attendance ,LeaveRequest
-from datetime import datetime 
+from datetime import datetime, date
 from pydantic import BaseModel, EmailStr
 import uvicorn
 import bcrypt
@@ -149,6 +150,22 @@ def start_attendance(payload: AttendanceStartRequest):
 @app.post("/attendance")
 def mark_attendance(data: AttendanceCreate, db: Session = Depends(get_db)):
     try:
+        today = date.today()  # YYYY-MM-DD
+
+        # Check if an attendance entry already exists for this student and class today
+        existing_entry = db.query(Attendance).filter(
+            Attendance.student_id == data.student_id,
+            Attendance.class_id == data.class_id,
+            func.date(Attendance.marked_at) == today  # only entries from today
+        ).first()
+
+        if existing_entry:
+            return {
+                "success": False,
+                "message": "Attendance already marked for this student in this class today."
+            }
+
+        # If not exists, create new entry
         entry = Attendance(
             student_id=data.student_id,
             class_id=data.class_id,
