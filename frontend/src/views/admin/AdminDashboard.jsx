@@ -4,6 +4,7 @@ import {
   CalendarDaysIcon,
   CheckBadgeIcon,
   MegaphoneIcon,
+  DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import { initialLeaveRequests, initialUsers } from "../../data/mockData.js";
 
@@ -109,6 +110,23 @@ export default function AdminDashboard({ user, setActiveView }) {
       color: "bg-purple-500",
       view: "announcements",
     },
+
+    {
+  title: "Manage Sessionals",
+  value: "Upload Marks and Answer Key",
+  icon: DocumentArrowUpIcon,
+  color: "bg-red-500",
+  view: "sessionals",
+},
+
+  {
+  title: "Manage Assignments",
+  value: "Upload Marks and Answer key",
+  icon: DocumentArrowUpIcon,
+  color: "bg-pink-500",
+  view: "assignments",
+},
+
   ];
 
   return (

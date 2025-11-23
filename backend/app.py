@@ -30,6 +30,7 @@ origins = [
     
 ]
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -231,7 +232,10 @@ def get_student(roll_num: str, db: Session = Depends(get_db)):
 def register_user(user: UserRegister, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == user.email).first()
     if existing:
-        raise HTTPException(status_code=400, detail="User already registered")
+        existing.role = user.role   # overwrite previous role
+        db.commit()
+        db.refresh(existing)
+        return {"message": "Role updated", "user": existing}
 
     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
         existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
@@ -272,10 +276,13 @@ def register_user(user: UserRegister, db: Session = Depends(get_db)):
         },
     }
 
+<<<<<<< HEAD
 
 # ---------------------------
 # LOGIN
 # ---------------------------
+=======
+>>>>>>> f3442f2 (my changes)
 @app.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     existingUser = db.query(User).filter(User.email == user.email).first()
@@ -285,6 +292,7 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
     prepared_password = prepare_password_for_bcrypt(user.password)
     if not bcrypt.checkpw(prepared_password.encode('utf-8'), existingUser.password.encode('utf-8')):
         raise HTTPException(status_code=400, detail="Invalid email or password")
+
 
     return {
         "message": "Login successful",
@@ -301,6 +309,7 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
         }
     }
 
+<<<<<<< HEAD
 
 
 # ---------------------------
@@ -840,6 +849,8 @@ def get_teachers(db: Session = Depends(get_db)):
 # ---------------------------
 # SERVER START
 # ---------------------------
+=======
+>>>>>>> f3442f2 (my changes)
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 

@@ -3,8 +3,9 @@ import { initialUsers } from "../../data/mockData";
 import { MagnifyingGlassIcon, EyeIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 export default function AdminStudentProfiles() {
+
   const allStudents = useMemo(() => 
-    Object.values(initialUsers).filter((user) => user.role === 'Student'), 
+    Object.values(initialUsers).filter((user) => user.role === 'Student') .sort((a, b) => a.profile.rollNo.localeCompare(b.profile.rollNo)), 
     []
   );
 

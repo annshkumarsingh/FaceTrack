@@ -7,6 +7,7 @@ import {
   UserCircleIcon,
   EnvelopeIcon,
   UsersIcon,
+  DocumentArrowUpIcon,
   PresentationChartBarIcon,
 } from "@heroicons/react/24/outline";
 
@@ -22,6 +23,16 @@ export default function Sidebar({
     { id: "attendance", label: "Attendance", icon: CheckCircleIcon },
     { id: "reports", label: "Reports", icon: DocumentChartBarIcon },
     { id: "leave", label: "Leave", icon: EnvelopeIcon },
+    {
+      id: "sessionals",
+      label: "Sessionals",
+      icon: DocumentArrowUpIcon, // or any icon you choose
+    },
+     {
+      id: "assignments",
+      label: "Assignments",
+      icon: DocumentArrowUpIcon, // or any icon you choose
+    },
     { id: "profile", label: "Profile", icon: UserCircleIcon },
   ];
 
@@ -31,7 +42,18 @@ export default function Sidebar({
     { id: "manage-schedule", label: "Manage Schedule", icon: CalendarIcon },
     { id: "leave-approvals", label: "Leave Approvals", icon: CheckCircleIcon },
     { id: "announcements", label: "Announcements", icon: EnvelopeIcon },
+     {
+      id: "sessionals",
+      label: "Sessionals",
+      icon: DocumentArrowUpIcon, // or any icon you choose
+    },
+    {
+      id: "assignments",
+      label: "Assignments",
+      icon: DocumentArrowUpIcon, // or any icon you choose
+    },
     { id: "profile", label: "Profile", icon: UserCircleIcon },
+   
   ];
 
   const menu = role === "Admin" ? adminMenu : studentMenu;
@@ -66,4 +88,3 @@ export default function Sidebar({
     </aside>
   );
 }
-

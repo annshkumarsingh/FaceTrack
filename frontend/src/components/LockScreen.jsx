@@ -15,6 +15,25 @@ export default function LockScreen({ onLogin, onRegister, users }) {
     setView("resetForm");
   };
 
+<<<<<<< HEAD
+=======
+  //Attendance system
+  const startAttendance = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/start-attendance", {
+        method: "POST",
+      });
+      const data = await res.json();
+      console.log(data);
+      alert("Attendance system started!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to start attendance system");
+    }
+  };
+
+
+>>>>>>> f3442f2 (my changes)
 
   const RoleChoiceScreen = () => (
     <div className="text-center w-full">
