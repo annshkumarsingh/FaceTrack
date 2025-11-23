@@ -10,6 +10,7 @@ from deepface import DeepFace
 import requests
 
 backend_url = os.getenv("BACKEND_URL")
+HEADLESS = os.environ.get("HEADLESS", "False") == "True"
 
 
 def main():
@@ -194,5 +195,8 @@ def main():
     cv2.destroyAllWindows()
 
 
-if __name__ == "__main__":
-    main()
+if HEADLESS:
+    print("Running in server mode: attendance marking disabled.")
+else:
+    if __name__ == "__main__":
+        main()
