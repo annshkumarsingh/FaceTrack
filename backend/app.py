@@ -26,7 +26,8 @@ backend_url = os.getenv("BACKEND_URL")
 app = FastAPI()
 
 origins = [
-    "https://facetrack-ai.netlify.app"
+    "https://facetrack-ai.netlify.app",
+    
 ]
 
 app.add_middleware(
