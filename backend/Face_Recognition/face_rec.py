@@ -4,8 +4,6 @@ import csv
 import time
 import sys
 import numpy as np
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-os.environ["DEEPFACE_HOME"] = os.path.join(BASE_DIR, "deepface_storage")
 from deepface import DeepFace
 import requests
 
@@ -27,7 +25,6 @@ def main():
         os.makedirs(faces_dir)
         print(f"Created folder: {faces_dir}. Please add student images here.")
 
-    embeddings_file = os.path.join(faces_dir, "embeddings.npy")
     attendance_file = os.path.join(BASE_DIR, "attendance.csv")
 
     model_name = "Facenet"
@@ -92,51 +89,20 @@ def main():
     print("Loading DeepFace model...")
     model = DeepFace.build_model(model_name)
 
-    # --- ENCODE KNOWN FACES OR LOAD CACHE ---
-    image_files = [f for f in os.listdir(faces_dir) if f.lower().endswith((".jpg", ".png"))]
-
-    if os.path.exists(embeddings_file):
-        cached_embeddings = np.load(embeddings_file, allow_pickle=True).item()
-        cached_names = set(cached_embeddings.keys())
-        current_names = set([os.path.splitext(f)[0] for f in image_files])
-
-        if cached_names != current_names:
-            print("Detected changes in face images. Re-encoding embeddings...")
-            known_embeddings = {}
-            for img_name in image_files:
-                img_path = os.path.join(faces_dir, img_name)
-                try:
-                    reps = DeepFace.represent(img_path=img_path, model_name=model_name, enforce_detection=False)
-                    if reps:
-                        embedding = reps[0]["embedding"]
-                        person_name = os.path.splitext(img_name)[0]
-                        known_embeddings[person_name] = embedding
-                        print(f"Encoded: {person_name}")
-                except Exception as e:
-                    print(f"Error encoding {img_name}: {e}")
-            # Save updated embeddings
-            np.save(embeddings_file, known_embeddings)
-            print(f"Saved embeddings to {embeddings_file}")
-        else:
-            print("Loading cached embeddings...")
-            known_embeddings = cached_embeddings
-    else:
-        print("No cached embeddings found. Encoding known faces...")
-        known_embeddings = {}
-        for img_name in image_files:
-            img_path = os.path.join(faces_dir, img_name)
-            try:
-                reps = DeepFace.represent(img_path=img_path, model_name=model_name, enforce_detection=False)
-                if reps:
-                    embedding = reps[0]["embedding"]
-                    person_name = os.path.splitext(img_name)[0]
-                    known_embeddings[person_name] = embedding
-                    print(f"Encoded: {person_name}")
-            except Exception as e:
-                print(f"Error encoding {img_name}: {e}")
-        # Save embeddings
-        np.save(embeddings_file, known_embeddings)
-        print(f"Saved embeddings to {embeddings_file}")
+    # --- ENCODE KNOWN FACES ---
+    print("Encoding known faces...")
+    known_embeddings = {}
+    for img_name in os.listdir(faces_dir):
+        img_path = os.path.join(faces_dir, img_name)
+        try:
+            reps = DeepFace.represent(img_path=img_path, model_name=model_name, enforce_detection=False)
+            if len(reps) > 0:
+                embedding = reps[0]["embedding"]
+                person_name = os.path.splitext(img_name)[0]
+                known_embeddings[person_name] = embedding
+                print(f"Encoded: {person_name}")
+        except Exception as e:
+            print(f"Error encoding {img_name}: {e}")
 
 
     print("All known faces encoded successfully.")
@@ -156,8 +122,7 @@ def main():
         current_time = time.time()
         if (current_time - last_recognition_time) > 2:
             try:
-                small_frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)  # 50% size
-                reps = DeepFace.represent(small_frame, model_name=model_name, enforce_detection=False)
+                reps = DeepFace.represent(frame, model_name=model_name, enforce_detection=False)
                 if len(reps) > 0:
                     embedding = np.array(reps[0]["embedding"])
                     min_dist = float("inf")
@@ -195,8 +160,8 @@ def main():
     cv2.destroyAllWindows()
 
 
-if HEADLESS:
-    print("Running in server mode: attendance marking disabled.")
-else:
-    if __name__ == "__main__":
+if __name__ == "__main__":
+    if HEADLESS:
+        print("Running in server mode: attendance marking disabled.")
+    else:
         main()

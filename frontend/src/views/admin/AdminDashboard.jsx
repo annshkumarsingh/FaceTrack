@@ -13,6 +13,7 @@ export default function AdminDashboard({ user, setActiveView }) {
   const [loading, setLoading] = useState(true);
 
   const backend_url = import.meta.env.VITE_BACKEND_URL
+  const HEADLESS = import.meta.env.VITE_HEADLESS
 
   // Fetch today's classes for the teacher
   const fetchTodayClasses = async () => {
@@ -32,8 +33,8 @@ export default function AdminDashboard({ user, setActiveView }) {
           const now = new Date();
           const now_hour = parseInt(now.getHours());
           const now_minutes = parseInt(now.getMinutes());
-          
-          if ((now_hour > class_start_hour || (now_hour==class_start_hour && now_minutes>=class_start_minutes)) && now_hour < class_end_hour) currClass = data.classes[i]
+
+          if ((now_hour > class_start_hour || (now_hour == class_start_hour && now_minutes >= class_start_minutes)) && now_hour < class_end_hour) currClass = data.classes[i]
         }
         if (!selectedClass) setSelectedClass(currClass || data.classes[0]);
       }
@@ -158,46 +159,50 @@ export default function AdminDashboard({ user, setActiveView }) {
       </div>
 
       {/* Mark Attendance */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-          Classes for Today:
-        </h2>
+      {HEADLESS=="True" ? (
+        <></>
+      ) : (
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
+            Classes for Today:
+          </h2>
 
-        {loading ? (
-          <p className="font-medium text-gray-500">
-            Loading your classes for today...
-          </p>
-        ) : todayClasses.length === 0 ? (
-          <p className="font-medium text-gray-500">
-            No classes scheduled for today.
-          </p>
-        ) : (
-          <div className="flex items-center gap-6">
-            <select
-              value={selectedClass?.id || ""}
-              onChange={(e) => {
-                const cls = todayClasses.find(c => c.id === parseInt(e.target.value));
-                setSelectedClass(cls);
-              }}
+          {loading ? (
+            <p className="font-medium text-gray-500">
+              Loading your classes for today...
+            </p>
+          ) : todayClasses.length === 0 ? (
+            <p className="font-medium text-gray-500">
+              No classes scheduled for today.
+            </p>
+          ) : (
+            <div className="flex items-center gap-6">
+              <select
+                value={selectedClass?.id || ""}
+                onChange={(e) => {
+                  const cls = todayClasses.find(c => c.id === parseInt(e.target.value));
+                  setSelectedClass(cls);
+                }}
 
-              className="p-2 rounded-lg border dark:bg-gray-700 dark:text-gray-200"
-            >
-              {todayClasses.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.subject} ({cls.time})
-                </option>
-              ))}
-            </select>
+                className="p-2 rounded-lg border dark:bg-gray-700 dark:text-gray-200"
+              >
+                {todayClasses.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.subject} ({cls.time})
+                  </option>
+                ))}
+              </select>
 
-            <button
-              onClick={startAttendance}
-              className="w-[250px] py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity"
-            >
-              Start Attendance
-            </button>
-          </div>
-        )}
-      </div>
+              <button
+                onClick={startAttendance}
+                className="w-[250px] py-3 rounded-lg bg-gradient-to-r from-purple-500 to-purple-600 text-white font-semibold shadow-md hover:opacity-90 transition-opacity"
+              >
+                Start Attendance
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
