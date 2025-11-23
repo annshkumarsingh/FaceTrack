@@ -57,7 +57,6 @@ export default function App() {
       const data = await response.json();
 
       if (response.ok) {
-        // Check if user role matches the selected role
         if (data.user.role === role) {
           const userData = {
             ...data.user,
