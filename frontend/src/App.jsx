@@ -32,7 +32,7 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const backend_url = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000"
+  const backend_url = import.meta.env.VITE_BACKEND_URL
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
