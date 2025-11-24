@@ -1,17 +1,17 @@
-📌 FaceTrack – Smart Attendance System
+#📌 FaceTrack – Smart Attendance System
 
 A full-stack AI-enabled smart attendance and academic management system designed for university environments. FaceTrack automates attendance using DeepFace-based face detection & recognition (local version), while also providing schedule management, leave management, announcements, sessional marks, assignment uploads, and student dashboards.
 
-🔗 Live Frontend: https://facetrack-ai.vercel.app
+🔗 ###Live Frontend: https://facetrack-ai.vercel.app
 
-🔗 Live Backend: https://facetrack-lia6.onrender.com
+🔗 ###Live Backend: https://facetrack-lia6.onrender.com
 
-⚠️ Note:
+⚠️ ###Note:
 Due to FastAPI + DeepFace model limitations on Render free tier, attendance marking (face recognition) is available only in the localhost version, not in the deployed version.
 All other modules work perfectly in both versions.
 
-📌 🚀 Features
-✅ Student Features
+📌 🚀 #Features
+✅ ##Student Features
 
 Face-based attendance (available in localhost version)
 
@@ -29,7 +29,7 @@ Access announcements from admin/faculty
 
 Manage profile (photo, address, phone, etc.)
 
-✅ Admin Features
+✅ ##Admin Features
 
 Approve/reject student leave requests
 
@@ -45,7 +45,7 @@ Post announcements
 
 View platform-wide dashboard stats
 
-✔️ AI/ML Components
+✔️ ##AI/ML Components
 
 DeepFace-based:
 
@@ -55,9 +55,7 @@ Face Alignment
 
 Face Verification (one-to-one matching)
 
-OCR (optional) for timetable images
-
-📌 Architecture Overview
+📌 ##Architecture Overview
 Localhost Version (Full System)
 React Frontend (localhost) 
       ↓
@@ -68,7 +66,7 @@ Supabase / Neon PostgreSQL Database
 
 This version supports real-time face attendance using DeepFace.
 
-Deployed Version (Live)
+##Deployed Version (Live)
 React Frontend (Vercel)
       ↓
 FastAPI Backend (Render)
@@ -78,8 +76,8 @@ Neon PostgreSQL Database
 
 Supports all features except attendance marking (DeepFace heavy models not supported on Render free tier).
 
-📌 🛠️ Technology Stack
-Frontend
+📌 🛠️ #Technology Stack
+#Frontend
 
 React.js
 
@@ -109,10 +107,6 @@ Pandas (Excel/CSV timetable parsing)
 
 OpenPyXL
 
-Tesseract OCR (optional for scanned timetable images)
-
-Python PIL
-
 Render (deployment)
 
 Database
@@ -123,7 +117,7 @@ Supabase (local version / development DB)
 
 Neon (production / deployed DB)
 
-📌 📁 Project Structure
+📌 📁 #Project Structure
 FaceTrack/
 │── frontend/
 │   ├── src/
@@ -139,20 +133,20 @@ FaceTrack/
 │   └── services/
 └── README.md
 
-📌 🌐 Deployment URLs
+📌 🌐 #Deployment URLs
 Component	Platform	URL
 Frontend	Vercel	https://facetrack-ai.vercel.app
 
 Backend	Render	https://facetrack-lia6.onrender.com
 
 Local Backend	Localhost	http://localhost:8000
-📌 🔐 Environment Variables
-Frontend (.env)
+📌 🔐 #Environment Variables
+##Frontend (.env)
 VITE_GEMINI_API_KEY=AIzaSyDGCvM-9DqR0l0bSSCvWknIjc4EhBKTXVM
 VITE_BACKEND_URL=http://localhost:8000
 VITE_HEADLESS=False
 
-Backend (.env)
+##Backend (.env)
 
 Supabase:
 
@@ -169,12 +163,12 @@ General:
 BACKEND_URL=http://localhost:8000
 HEADLESS=False
 
-📌 🧪 Running the Project Locally
-1️⃣ Clone the Repo
+📌 🧪 #Running the Project Locally
+1️⃣ ##Clone the Repo
 git clone https://github.com/annshkumarsingh/FaceTrack
 cd FaceTrack
 
-2️⃣ Run Backend
+2️⃣ ##Run Backend
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload
@@ -184,7 +178,7 @@ Backend will run at:
 
 http://localhost:8000
 
-3️⃣ Run Frontend
+3️⃣ ##Run Frontend
 cd frontend
 npm install
 npm run dev
@@ -194,7 +188,7 @@ Frontend will run at:
 
 http://localhost:5173
 
-📌 📤 API Documentation
+📌 📤 #API Documentation
 
 Once backend is running locally, view interactive documentation:
 
@@ -207,8 +201,8 @@ ReDoc:
 
 http://localhost:8000/redoc
 
-📌 📄 Modules Overview
-✔ Attendance Module
+📌 📄 #Modules Overview
+✔ ##Attendance Module
 
 Webcam capture → backend (base64)
 
@@ -216,7 +210,7 @@ DeepFace verification
 
 If matched → attendance saved in DB
 
-✔ Schedule Module
+✔ ##Schedule Module
 
 Upload Excel/CSV
 
@@ -224,7 +218,7 @@ Auto-parse using Pandas
 
 Optional image upload → OCR → manual entry
 
-✔ Leave Management
+✔ ##Leave Management
 
 Students apply
 
@@ -232,7 +226,7 @@ Admin approves/rejects
 
 Status updates in dashboard
 
-✔ Marks & Assignments Module
+✔ ##Marks & Assignments Module
 
 Admin uploads:
 
@@ -244,13 +238,13 @@ Assignment solutions (PDF/images)
 
 Students view/download
 
-✔ Announcement Module
+✔ ##Announcement Module
 
 Admin posts updates
 
 Students view chronologically
 
-📌 🤝 Contributors
+📌 🤝 #Contributors
 
 Annsh Kumar Singh
 
@@ -260,6 +254,6 @@ Keshav
 
 Neha
 
-📌 📜 License
+📌 📜 #License
 
 This project is open-source. You may use it for learning, research, or academic purposes.
