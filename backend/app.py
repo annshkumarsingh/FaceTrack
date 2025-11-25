@@ -27,13 +27,8 @@ Base.metadata.create_all(bind=engine)
 
 
 origins = [
-<<<<<<< HEAD
     "https://facetrack-ai.vercel.app",
     "http://localhost:5173"
-=======
-    "https://facetrack-ai.netlify.app",
-    "http://localhost:5173",
->>>>>>> neha
 ]
 
 app = FastAPI()
@@ -233,57 +228,8 @@ def get_student(roll_num: str, db: Session = Depends(get_db)):
 # ---------------------------
 # REGISTER
 # ---------------------------
-# @app.post("/register")
-# def register_user(user: UserRegister, db: Session = Depends(get_db)):
-#     existing = db.query(User).filter(User.email == user.email).first()
-#     if existing:
-#         existing.role = user.role   # overwrite previous role
-#         db.commit()
-#         db.refresh(existing)
-#         return {"message": "Role updated", "user": existing}
 
-#     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
-#         existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
-#         if existing_roll:
-#             raise HTTPException(status_code=400, detail="Roll number already exists")
-
-#     prepared_password = prepare_password_for_bcrypt(user.password)
-#     salt = bcrypt.gensalt()
-#     hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
-
-#     roll_number_value = None
-#     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
-#         roll_number_value = user.rollNumber
-
-#     new_user = User(
-#         full_name=user.fullName,
-#         roll_number=roll_number_value,
-#         course=user.course,
-#         semester=user.semester,
-#         phone=user.phone,
-#         email=user.email,
-#         password=hashed_pw,
-#         profile_pic=user.profilePic,
-#         role=user.role,
-#     )
-
-    
-
-    # db.add(new_user)
-    # db.commit()
-    # db.refresh(new_user)
-
-    # return {
-    #     "message": "Registration successful",
-    #     "user": {
-    #         "id": new_user.id,
-    #         "email": new_user.email,
-    #         "name": new_user.full_name,
-    #         "role": new_user.role,
-    #     },
-    # }
-
-    @app.post("/register")
+@app.post("/register")
 def register_user(user: UserRegister, db: Session = Depends(get_db)):
 
     # 1️⃣ Check if the email already exists (ANY role)
