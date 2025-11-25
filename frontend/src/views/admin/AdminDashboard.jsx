@@ -5,6 +5,7 @@ import {
   CheckBadgeIcon,
   MegaphoneIcon,
   DocumentArrowUpIcon,
+  AdjustmentsHorizontalIcon
 } from "@heroicons/react/24/outline";
 import { initialLeaveRequests, initialUsers } from "../../data/mockData.js";
 
@@ -114,7 +115,7 @@ export default function AdminDashboard({ user, setActiveView }) {
     {
   title: "Manage Sessionals",
   value: "Upload Marks and Answer Key",
-  icon: DocumentArrowUpIcon,
+  icon: AdjustmentsHorizontalIcon,
   color: "bg-red-500",
   view: "sessionals",
 },

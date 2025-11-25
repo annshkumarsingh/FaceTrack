@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database.database import get_db
-from database.models import User, Class, Schedule, Announcement, Attendance ,LeaveRequest
+from database.models import User, Class, Schedule, Announcement, Attendance ,LeaveRequest, Assignment, StudentMarks
 from datetime import datetime, date
 from pydantic import BaseModel, EmailStr
 import uvicorn
@@ -18,17 +18,20 @@ from PIL import Image
 import pytesseract
 from typing import List
 from dotenv import load_dotenv
+from routers.admin_routes import router as admin_router
+# from routers.student_routes import router as student_router
 
-load_dotenv()
+from database.database import Base, engine
+Base.metadata.create_all(bind=engine)
 
-backend_url = os.getenv("BACKEND_URL")
 
-app = FastAPI()
 
 origins = [
     "https://facetrack-ai.netlify.app",
-    
+    "http://localhost:5173",
 ]
+
+app = FastAPI()
 
 
 app.add_middleware(
@@ -38,6 +41,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+
+app.include_router(admin_router)
+# app.include_router(student_router)
+
+load_dotenv()
+
+backend_url = os.getenv("BACKEND_URL")
+
 
 # ---------------------------
 # MODELS
@@ -77,12 +90,6 @@ class AttendanceCreate(BaseModel):
     class_id: int
     status: str = "present"
 
-
-
-
-
-
-
 # ---------------------------
 # PASSWORD HELPERS
 # ---------------------------
@@ -94,13 +101,6 @@ def prepare_password_for_bcrypt(password: str) -> str:
     return password
 
 # ... (keep all your existing routes: home, start-attendance, register, login) ...
-
-
-
-
-
-
-
 
 
 # ---------------------------
@@ -228,28 +228,85 @@ def get_student(roll_num: str, db: Session = Depends(get_db)):
 # ---------------------------
 # REGISTER
 # ---------------------------
-@app.post("/register")
-def register_user(user: UserRegister, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == user.email).first()
-    if existing:
-        existing.role = user.role   # overwrite previous role
-        db.commit()
-        db.refresh(existing)
-        return {"message": "Role updated", "user": existing}
+# @app.post("/register")
+# def register_user(user: UserRegister, db: Session = Depends(get_db)):
+#     existing = db.query(User).filter(User.email == user.email).first()
+#     if existing:
+#         existing.role = user.role   # overwrite previous role
+#         db.commit()
+#         db.refresh(existing)
+#         return {"message": "Role updated", "user": existing}
 
+#     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+#         existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
+#         if existing_roll:
+#             raise HTTPException(status_code=400, detail="Roll number already exists")
+
+#     prepared_password = prepare_password_for_bcrypt(user.password)
+#     salt = bcrypt.gensalt()
+#     hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
+
+#     roll_number_value = None
+#     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+#         roll_number_value = user.rollNumber
+
+#     new_user = User(
+#         full_name=user.fullName,
+#         roll_number=roll_number_value,
+#         course=user.course,
+#         semester=user.semester,
+#         phone=user.phone,
+#         email=user.email,
+#         password=hashed_pw,
+#         profile_pic=user.profilePic,
+#         role=user.role,
+#     )
+
+    
+
+    # db.add(new_user)
+    # db.commit()
+    # db.refresh(new_user)
+
+    # return {
+    #     "message": "Registration successful",
+    #     "user": {
+    #         "id": new_user.id,
+    #         "email": new_user.email,
+    #         "name": new_user.full_name,
+    #         "role": new_user.role,
+    #     },
+    # }
+
+    @app.post("/register")
+def register_user(user: UserRegister, db: Session = Depends(get_db)):
+
+    # 1️⃣ Check if the email already exists (ANY role)
+    existing = db.query(User).filter(User.email == user.email).first()
+
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"This email is already registered as {existing.role}"
+        )
+
+    # 2️⃣ If registering as a student, check roll number uniqueness
     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
         existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
         if existing_roll:
             raise HTTPException(status_code=400, detail="Roll number already exists")
 
+    # 3️⃣ Hash password
     prepared_password = prepare_password_for_bcrypt(user.password)
     salt = bcrypt.gensalt()
     hashed_pw = bcrypt.hashpw(prepared_password.encode('utf-8'), salt).decode('utf-8')
 
+    # 4️⃣ Roll number only for students
     roll_number_value = None
     if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
         roll_number_value = user.rollNumber
 
+    # 5️⃣ Create new user normally
     new_user = User(
         full_name=user.fullName,
         roll_number=roll_number_value,
@@ -266,23 +323,15 @@ def register_user(user: UserRegister, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {
-        "message": "Registration successful",
-        "user": {
-            "id": new_user.id,
-            "email": new_user.email,
-            "name": new_user.full_name,
-            "role": new_user.role,
-        },
-    }
+    return {"message": "User registered successfully", "user": new_user}
 
-<<<<<<< HEAD
+
+
 
 # ---------------------------
 # LOGIN
 # ---------------------------
-=======
->>>>>>> f3442f2 (my changes)
+
 @app.post("/login")
 def login_user(user: UserLogin, db: Session = Depends(get_db)):
     existingUser = db.query(User).filter(User.email == user.email).first()
@@ -308,9 +357,6 @@ def login_user(user: UserLogin, db: Session = Depends(get_db)):
             "designation": getattr(existingUser, 'designation', None)
         }
     }
-
-<<<<<<< HEAD
-
 
 # ---------------------------
 # GET USER PROFILE
@@ -849,8 +895,7 @@ def get_teachers(db: Session = Depends(get_db)):
 # ---------------------------
 # SERVER START
 # ---------------------------
-=======
->>>>>>> f3442f2 (my changes)
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 

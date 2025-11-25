@@ -129,7 +129,7 @@ const AdminRegister = ({ onBack, onRegister }) => {
 
 
 // --- Main Auth Page Component ---
-export default function AuthPage({ onLogin, onRegister }) {
+export default function Page({ onLogin, onRegister }) {
   const [view, setView] = useState("initial");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

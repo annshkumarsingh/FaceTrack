@@ -30,17 +30,17 @@ export default function AdminSessionalUpload() {
             <label className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
               Course
             </label>
-            <input
+            <select
               placeholder="BTech ECE"
               value={course}
               onChange={(e) => setCourse(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500"
             >
-              {/* <option value="">Select Course</option>
+              <option value="">Select Course</option>
               <option>B.Tech CSE</option>
               <option>B.Tech ECE</option>
-              <option>BBA</option> */}
-            </input>
+              <option>BBA</option>
+            </select>
           </div>
 
           {/* Semester */}

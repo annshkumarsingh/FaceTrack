@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-<<<<<<< HEAD
 
 export default function StudentDashboard({ user }) {
   const [aiPlan, setAiPlan] = useState("");
@@ -9,14 +8,6 @@ export default function StudentDashboard({ user }) {
   const backend_url = import.meta.env.VITE_BACKEND_URL
 
   // Fetch announcements from backend
-=======
-import { initialAnnouncements } from "../../data/mockData.js";
-
-
-export default function StudentDashboard({ user }) {
-  const [aiPlan, setAiPlan] = useState("");
-  console.log(user);
->>>>>>> f3442f2 (my changes)
   useEffect(() => {
     fetchAnnouncements();
   }, []);
@@ -24,7 +15,8 @@ export default function StudentDashboard({ user }) {
   const fetchAnnouncements = async () => {
     setLoadingAnnouncements(true);
     try {
-      const response = await fetch(`${backend_url}/announcements`);
+      // const response = await fetch(`${backend_url}/announcements`);
+      const response = await fetch(backend_url/announcements);
       const data = await response.json();
       setAnnouncements(data);
     } catch (error) {
@@ -47,11 +39,7 @@ export default function StudentDashboard({ user }) {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-<<<<<<< HEAD
-        Welcome, {user.name}
-=======
         Welcome, {user.full_name}
->>>>>>> f3442f2 (my changes)
       </h2>
       {/* Attendance Summary */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
@@ -60,10 +48,10 @@ export default function StudentDashboard({ user }) {
         </h3>
         <p className="text-gray-600 dark:text-gray-400">
           Overall Attendance:{" "}
-<<<<<<< HEAD
+{/* <<<<<<< HEAD
           <span className="text-green-600 font-bold">
             {user?.attendanceSummary?.overall || "N/A"}%
-=======
+======= */}
           <span
             className={
               // user.attendanceSummary.overall < 75
@@ -74,7 +62,6 @@ export default function StudentDashboard({ user }) {
             }
           >
           {/* {user?.attendanceSummary?.overall ? user.attendanceSummary.overall : "100"}% */} 100%
->>>>>>> f3442f2 (my changes)
           </span>
         </p>
       </div>

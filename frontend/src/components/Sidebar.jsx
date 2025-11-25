@@ -9,6 +9,7 @@ import {
   UsersIcon,
   DocumentArrowUpIcon,
   PresentationChartBarIcon,
+  AdjustmentsHorizontalIcon,
 } from "@heroicons/react/24/outline";
 
 export default function Sidebar({
@@ -26,7 +27,7 @@ export default function Sidebar({
     {
       id: "sessionals",
       label: "Sessionals",
-      icon: DocumentArrowUpIcon, // or any icon you choose
+      icon: AdjustmentsHorizontalIcon, // or any icon you choose
     },
      {
       id: "assignments",
@@ -45,7 +46,7 @@ export default function Sidebar({
      {
       id: "sessionals",
       label: "Sessionals",
-      icon: DocumentArrowUpIcon, // or any icon you choose
+      icon: AdjustmentsHorizontalIcon, // or any icon you choose
     },
     {
       id: "assignments",

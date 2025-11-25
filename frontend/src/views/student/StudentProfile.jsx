@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react"
 export default function StudentProfile({ user, onLogout }) {
   const [editing, setEditing] = useState(false)
   const [profile, setProfile] = useState(user)
-<<<<<<< HEAD
 
   const backend_url = import.meta.env.VITE_BACKEND_URL
 
@@ -18,9 +17,6 @@ export default function StudentProfile({ user, onLogout }) {
       })
       .catch((err) => console.log(err))
   }, [user.id])
-=======
-  console.log(user);
->>>>>>> f3442f2 (my changes)
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -60,13 +56,13 @@ export default function StudentProfile({ user, onLogout }) {
       {/* Profile Card */}
       <div className="bg-white dark:bg-gray-800 dark:text-gray-200 shadow rounded-lg p-6 flex flex-col md:flex-row gap-6">
         <div className="flex-shrink-0">
-<<<<<<< HEAD
+{/* <<<<<<< HEAD */}
           <img
-            src={profile.profile_pic}
-=======
+            src={profile.profile_pic}/>
+// =======
           {/* <img
             src={profile.imageUrl}
->>>>>>> f3442f2 (my changes)
+// >>>>>>> f3442f2 (my changes)
             alt={profile.name}
             className="h-32 w-32 rounded-full border object-cover"
           /> */}

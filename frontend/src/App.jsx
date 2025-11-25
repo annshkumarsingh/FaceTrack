@@ -50,12 +50,10 @@ export default function App() {
 
   const handleLogin = async (email, password, role) => {
     try {
-<<<<<<< HEAD
+
       const response = await fetch(`${backend_url}/login`, {
-=======
-      const response = await fetch('http://127.0.0.1:8000/login', {
->>>>>>> f3442f2 (my changes)
         method: 'POST',
+
         headers: {
           'Content-Type': 'application/json',
         },
@@ -77,20 +75,12 @@ export default function App() {
             role: data.user.role,
             roll_number: data.user.roll_number,
             course: data.user.course,
-<<<<<<< HEAD
             semester: data.user.semester,
             id: data.user.id
           };
           setCurrentUser(userData);
 
           localStorage.setItem("user", JSON.stringify(userData));
-=======
-            semester: data.user.semester
-          });
-
-          console.log("Response from backend:", data);  // ✅ This logs everything
-          console.log("User object:", data.user);
->>>>>>> f3442f2 (my changes)
 
           setActiveView("dashboard");
           return true;
@@ -114,27 +104,7 @@ export default function App() {
   const handleRegister = async (email, newUser) => {
 
     try {
-<<<<<<< HEAD
       const response = await fetch(`${backend_url}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName: newUser.fullName,
-          rollNumber: newUser.rollNumber,
-          course: newUser.course,
-          semester: newUser.semester,
-          phone: newUser.phone,
-          email: email,
-          password: newUser.password,
-          profilePic: newUser.profilePic,
-          role: newUser.role,
-          designation: newUser.designation,
-          department: newUser.department
-        }),
-=======
-      const response = await fetch("http://127.0.0.1:8000/register", {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
@@ -152,7 +122,6 @@ export default function App() {
               designation:newUser.designation,
               department:newUser.department
           }),
->>>>>>> f3442f2 (my changes)
       });
 
       const data = await response.json();
@@ -240,13 +209,9 @@ export default function App() {
         case "schedule": return <StudentSchedule user={currentUser} />;
         case "attendance": return <StudentAttendance />;
         case "reports": return <StudentReports />;
-<<<<<<< HEAD
-        case "leave": return <StudentLeave user={currentUser} />;
-=======
         case "leave": return <StudentLeave user={currentUser}/>;
         case "sessionals" : return <StudentSessionalMarks/>;
         case "assignments" : return <StudentAssignments/>;
->>>>>>> f3442f2 (my changes)
         default: return <StudentDashboard user={currentUser} />;
       }
     }
@@ -258,7 +223,7 @@ export default function App() {
         case "manage-schedule": return <AdminManageSchedule />;
         case "leave-approvals": return <AdminLeaveApprovals />;
         case "announcements": return <AdminAnnouncements />;
-        case "sessional": return <AdminSessionalUpload/>;
+        case "sessionals": return <AdminSessionalUpload/>;
         case "assignments" : return <AdminAssignments/>;
         case "profile": return <AdminProfile user={currentUser} onLogout={handleLogout} />;
         default: return <AdminDashboard user={currentUser} setActiveView={setActiveView} />;

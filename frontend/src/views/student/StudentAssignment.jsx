@@ -10,9 +10,10 @@ export default function StudentAssignments() {
 
   return (
     <div className="p-6 w-full">
-      <h2 className="text-2xl font-semibold mb-4">Assignment Answer Keys</h2>
-
-      <div className="space-y-4 w-full max-w-lg">
+      <h2 className="text-3xl px-7 font-bold text-gray-900 dark:text-gray-100">
+        Check Answers
+      </h2>
+      <div className="space-y-4 w-full max-w-lg m-6">
         
         <select
           className="w-full border p-2 rounded"
@@ -39,7 +40,7 @@ export default function StudentAssignments() {
         <button
           disabled={!semester || !subject}
           onClick={handleDownload}
-          className="bg-green-600 text-white p-2 w-full rounded disabled:bg-gray-400"
+          className="bg-blue-600 text-white p-2 w-full rounded disabled:bg-gray-400"
         >
           Download Answer Key
         </button>

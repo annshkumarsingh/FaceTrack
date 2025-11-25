@@ -9,7 +9,6 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("POSTGRE_DATABASE_URL")
 
-<<<<<<< HEAD
 if not DATABASE_URL:
     raise RuntimeError("POSTGRE_DATABASE_URL is not set in .env")
 
@@ -25,9 +24,6 @@ engine = create_engine(
     max_overflow=0,
 )
 
-=======
-engine = create_engine(DATABASE_URL)
->>>>>>> f3442f2 (my changes)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
 
