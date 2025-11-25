@@ -15,7 +15,8 @@ export default function StudentDashboard({ user }) {
   const fetchAnnouncements = async () => {
     setLoadingAnnouncements(true);
     try {
-      const response = await fetch(`${backend_url}/announcements`);
+      // const response = await fetch(`${backend_url}/announcements`);
+      const response = await fetch(backend_url/announcements);
       const data = await response.json();
       setAnnouncements(data);
     } catch (error) {
@@ -38,9 +39,8 @@ export default function StudentDashboard({ user }) {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-        Welcome, {user.name}
+        Welcome, {user.full_name}
       </h2>
-
       {/* Attendance Summary */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">
@@ -48,8 +48,20 @@ export default function StudentDashboard({ user }) {
         </h3>
         <p className="text-gray-600 dark:text-gray-400">
           Overall Attendance:{" "}
+{/* <<<<<<< HEAD
           <span className="text-green-600 font-bold">
             {user?.attendanceSummary?.overall || "N/A"}%
+======= */}
+          <span
+            className={
+              // user.attendanceSummary.overall < 75
+              80 < 75
+
+                ? "text-red-500 font-bold"
+                : "text-green-600 font-bold"
+            }
+          >
+          {/* {user?.attendanceSummary?.overall ? user.attendanceSummary.overall : "100"}% */} 100%
           </span>
         </p>
       </div>

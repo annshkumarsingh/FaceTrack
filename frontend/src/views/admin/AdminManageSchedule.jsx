@@ -26,7 +26,7 @@ export default function AdminManageSchedule() {
       const data = await response.json();
       setSchedule(data);
     } catch (error) {
-      console.error("Error fetching schedule:", error);
+      console.log("Error fetching schedule:", error);
       alert("Failed to load schedule");
     } finally {
       setLoading(false);
@@ -66,7 +66,7 @@ export default function AdminManageSchedule() {
         alert(`❌ Upload failed: ${data.detail}`);
       }
     } catch (error) {
-      console.error("Upload error:", error);
+      console.log("Upload error:", error);
       alert("Network error. Please try again.");
     } finally {
       setUploading(false);

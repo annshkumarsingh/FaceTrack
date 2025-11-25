@@ -13,6 +13,9 @@ import StudentSchedule from "./views/student/StudentSchedule.jsx";
 import StudentAttendance from "./views/student/StudentAttendance.jsx";
 import StudentReports from "./views/student/StudentReports.jsx";
 import StudentLeave from "./views/student/StudentLeave.jsx";
+import StudentSessionalMarks from "./views/student/StudentSessional.jsx";
+import StudentAssignments from "./views/student/StudentAssignment.jsx";
+
 
 // Admin Views
 import AdminDashboard from "./views/admin/AdminDashboard.jsx";
@@ -21,9 +24,13 @@ import AdminLeaveApprovals from "./views/admin/AdminLeaveApprovals.jsx";
 import AdminAnnouncements from "./views/admin/AdminAnnouncements.jsx";
 import AdminStudentProfiles from "./views/admin/AdminStudentProfiles.jsx";
 import AdminProfile from "./views/admin/AdminProfile.jsx";
+import AdminSessionalUpload from "./views/admin/AdminSessional.jsx";
+// import AdminAnnouncements from "./views/admin/AdminAnnouncements.jsx";
+import AdminAssignments from "./views/admin/AdminAssignment.jsx";
 
 // Mock Data
 import { initialUsers } from "./data/mockData.js";
+// import AdminAssignments from "./views/admin/AdminAssignment.jsx";
 
 export default function App() {
   // const [users, setUsers] = useState(initialUsers);
@@ -43,8 +50,10 @@ export default function App() {
 
   const handleLogin = async (email, password, role) => {
     try {
+
       const response = await fetch(`${backend_url}/login`, {
         method: 'POST',
+
         headers: {
           'Content-Type': 'application/json',
         },
@@ -95,23 +104,23 @@ export default function App() {
 
     try {
       const response = await fetch(`${backend_url}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          fullName: newUser.fullName,
-          rollNumber: newUser.rollNumber,
-          course: newUser.course,
-          semester: newUser.semester,
-          phone: newUser.phone,
-          email: email,
-          password: newUser.password,
-          profilePic: newUser.profilePic,
-          role: newUser.role,
-          designation: newUser.designation,
-          department: newUser.department
-        }),
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+              fullName: newUser.fullName,
+              rollNumber: newUser.rollNumber,
+              course: newUser.course,
+              semester: newUser.semester,
+              phone: newUser.phone,
+              email: email,
+              password: newUser.password,
+              profilePic: newUser.profilePic,
+              role: newUser.role,
+              designation:newUser.designation,
+              department:newUser.department
+          }),
       });
 
       const data = await response.json();
@@ -199,7 +208,9 @@ export default function App() {
         case "schedule": return <StudentSchedule user={currentUser} />;
         case "attendance": return <StudentAttendance />;
         case "reports": return <StudentReports />;
-        case "leave": return <StudentLeave user={currentUser} />;
+        case "leave": return <StudentLeave user={currentUser}/>;
+        case "sessionals" : return <StudentSessionalMarks/>;
+        case "assignments" : return <StudentAssignments/>;
         default: return <StudentDashboard user={currentUser} />;
       }
     }
@@ -211,6 +222,8 @@ export default function App() {
         case "manage-schedule": return <AdminManageSchedule />;
         case "leave-approvals": return <AdminLeaveApprovals />;
         case "announcements": return <AdminAnnouncements />;
+        case "sessionals": return <AdminSessionalUpload/>;
+        case "assignments" : return <AdminAssignments/>;
         case "profile": return <AdminProfile user={currentUser} onLogout={handleLogout} />;
         default: return <AdminDashboard user={currentUser} setActiveView={setActiveView} />;
       }

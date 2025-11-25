@@ -143,37 +143,91 @@ export default function LockScreen({ onLogin, onRegister, users }) {
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-slate-300 dark:from-gray-900 dark:to-gray-800">
+//   return (
+//     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-100 to-slate-300 dark:from-gray-900 dark:to-gray-800">
 
-      {/* Header */}
-      <header className="backdrop-blur-md bg-white/20 dark:bg-gray-900/20 border-b border-white/30 dark:border-gray-700/30 shadow-lg sticky top-0 z-20">
-        <div className="container mx-auto flex justify-center items-center gap-6 py-4 px-6">
-          <div className="h-20 w-20 rounded-3xl overflow-hidden shadow-xl ring-2 ring-white/50 dark:ring-gray-700 flex-shrink-0">
-            <img
-              src="/YMCA_Logo.jpg"
-              alt="University Logo"
-              className="h-full w-full object-cover"
-            />
-          </div>
+//       {/* Header */}
+//       <header className="backdrop-blur-md bg-white/20 dark:bg-gray-900/20 border-b border-white/30 dark:border-gray-700/30 shadow-lg sticky top-0 z-20">
+//         <div className="container mx-auto flex justify-center items-center gap-6 py-4 px-6">
+//           <div className="h-20 w-20 rounded-3xl overflow-hidden shadow-xl ring-2 ring-white/50 dark:ring-gray-700 flex-shrink-0">
+//             <img
+//               src="/YMCA_Logo.jpg"
+//               alt="University Logo"
+//               className="h-full w-full object-cover"
+//             />
+//           </div>
 
-          <div className="flex flex-col text-gray-900 dark:text-white">
-            <h1 className="text-3xl md:text-3xl font-medium tracking-tight drop-shadow-sm">
-              J.C. Bose University of Science and Technology
-            </h1>
-            <p className="md:text-xl font-medium text-center text-base text-gray-700 dark:text-gray-300 tracking-wide">
-              YMCA, Faridabad
-            </p>
-          </div>
+//           <div className="flex flex-col text-gray-900 dark:text-white">
+//             <h1 className="text-3xl md:text-3xl font-medium tracking-tight drop-shadow-sm">
+//               J.C. Bose University of Science and Technology
+//             </h1>
+//             <p className="md:text-xl font-medium text-center text-base text-gray-700 dark:text-gray-300 tracking-wide">
+//               YMCA, Faridabad
+//             </p>
+//           </div>
+//         </div>
+//       </header>
+
+//       {/* Main Content */}
+//       <main className="flex flex-1 items-center justify-center px-4 py-14">
+//         <div className="relative w-full max-w-xl p-10 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl">
+//           {renderContent && renderContent()}
+//         </div>
+//       </main>
+//     </div>
+//   );
+// }
+
+
+return (
+  <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-black transition-all">
+
+    {/* Improved Header */}
+    <header className="sticky top-0 z-20 backdrop-blur-xl bg-white/10 dark:bg-gray-900/20 border-b border-white/30 dark:border-gray-700/30 shadow-lg">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-center items-center gap-4 py-8 px-6">
+
+        {/* Logo */}
+        <div className="h-24 w-24 rounded-3xl overflow-hidden shadow-2xl ring-2 ring-white/40 dark:ring-gray-700/40 transition hover:scale-105">
+          <img
+            src="/YMCA_Logo.jpg"
+            alt="University Logo"
+            className="h-full w-full object-cover"
+          />
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="flex flex-1 items-center justify-center px-4 py-14">
-        <div className="relative w-full max-w-xl p-10 rounded-3xl shadow-2xl border border-white/40 dark:border-gray-700/40 bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl">
+        {/* Title */}
+        <div className="text-center text-gray-900 dark:text-white space-y-1">
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-sm">
+            J.C. Bose University of Science and Technology
+          </h1>
+          <p className="text-lg md:text-xl font-medium text-gray-700 dark:text-gray-300">
+            YMCA, Faridabad
+          </p>
+        </div>
+
+      </div>
+    </header>
+
+    {/* Main Content */}
+    <main className="flex flex-1 items-center justify-center px-6 py-20">
+
+      <div className="
+        w-full max-w-2xl 
+        rounded-[45px] 
+        p-12
+        bg-white/30 dark:bg-gray-800/30 
+        backdrop-blur-2xl
+        shadow-[0_25px_70px_-10px_rgba(0,0,0,0.25)]
+        hover:shadow-[0_35px_90px_-10px_rgba(0,0,0,0.35)]
+        transition-all
+        border border-white/40 dark:border-gray-700/30
+      ">
+        {/* Fade-in animation */}
+        <div className="animate-[fadeIn_0.7s_ease]">
           {renderContent && renderContent()}
         </div>
-      </main>
-    </div>
-  );
+      </div>
+    </main>
+  </div>
+);
 }

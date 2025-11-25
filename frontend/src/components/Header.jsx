@@ -3,7 +3,7 @@ import {
   SunIcon,
   MoonIcon,
   BellIcon,
-  ArrowLeftOnRectangleIcon,
+  ArrowRightStartOnRectangleIcon,
   Bars3Icon,
 } from "@heroicons/react/24/outline";
 
@@ -97,7 +97,7 @@ export default function Header({
             title="Logout"
             aria-label="Logout"
           >
-            <ArrowLeftOnRectangleIcon className="h-6 w-6" />
+            <ArrowRightStartOnRectangleIcon className="h-6 w-6" />
           </button>
         </div>
       </div>
