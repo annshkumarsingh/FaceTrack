@@ -39,8 +39,10 @@ export default function StudentDashboard({ user }) {
   return (
     <div className="p-4 sm:p-6 space-y-6">
       <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-        Welcome, {user.full_name}
+        Welcome, {user.name}
+        {console.log(user)}
       </h2>
+      
       {/* Attendance Summary */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-300">

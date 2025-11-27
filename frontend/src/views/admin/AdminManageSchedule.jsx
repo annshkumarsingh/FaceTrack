@@ -12,6 +12,7 @@ export default function AdminManageSchedule() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [extractedText, setExtractedText] = useState("");
+ 
 
   const backend_url = import.meta.env.VITE_BACKEND_URL
 
@@ -56,6 +57,7 @@ export default function AdminManageSchedule() {
         // Check if it's an image upload
         if (data.extracted_text) {
           setExtractedText(data.extracted_text);
+          { console.log("extractedText", extractedText)}
           alert(`📷 Image uploaded! Please review the extracted text below and manually enter the schedule.`);
         } else {
           alert(`✅ Schedule uploaded successfully! ${data.rows_processed} rows processed.`);

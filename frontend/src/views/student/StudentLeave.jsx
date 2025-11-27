@@ -177,7 +177,7 @@ export default function StudentLeave({ user }) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Assign to Teacher (Optional)
+            Assign to Teacher <span className="text-red-500">*</span>
           </label>
           <select
             name="teacher_name"
@@ -195,7 +195,7 @@ export default function StudentLeave({ user }) {
           </select>
         </div>
 
-        <div>
+        <div>a
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Reason <span className="text-red-500">*</span>
           </label>

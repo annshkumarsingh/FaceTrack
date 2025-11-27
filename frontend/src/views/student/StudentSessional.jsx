@@ -100,10 +100,14 @@ const [solutionQa, setSolutionQa] = useState([]);
           onChange={(e) => setCourse(e.target.value)}
           className="p-3 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
         >
-          <option value="">Select Course</option>
-          <option value="B.Tech CSE">B.Tech CSE</option>
-          <option value="B.Tech ECE">B.Tech ECE</option>
-          <option value="BBA">BBA</option>
+              <option value="">Select Course</option>
+              <option>B.Tech CSE</option>
+              <option>B.Tech CDSE</option>
+              <option>B.Tech IT</option>
+              <option>B.Tech ECE</option>
+              <option>B.Tech ENC</option>
+              <option>B.Tech CIVIL</option>
+              <option>B.Tech ELECTRICAL</option>
         </select>
 
         {/* Semester */}
@@ -113,14 +117,14 @@ const [solutionQa, setSolutionQa] = useState([]);
           className="p-3 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
         >
           <option value="">Select Semester</option>
-          <option value="1">1st Semester</option>
-          <option value="2">2nd Semester</option>
-          <option value="3">3rd Semester</option>
-          <option value="4">4th Semester</option>
-          <option value="5">5th Semester</option>
-          <option value="6">6th Semester</option>
-          <option value="7">7th Semester</option>
-          <option value="8">8th Semester</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
         </select>
 
         {/* Sessional type */}

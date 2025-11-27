@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function AdminProfile({ user, onLogout }) {
+  console.log(user);
 
   const [profile, setProfile] = useState(user);
 
@@ -22,6 +23,7 @@ export default function AdminProfile({ user, onLogout }) {
         .then((res) => res.json())
         .then((data) => {
           setProfile(data)
+          console.log(profile);
           localStorage.setItem("user", JSON.stringify(data))
         })
         .catch((err) => console.log(err))

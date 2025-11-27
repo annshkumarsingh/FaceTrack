@@ -127,8 +127,12 @@ export default function AdminSessionalUpload() {
             >
               <option value="">Select Course</option>
               <option>B.Tech CSE</option>
+              <option>B.Tech CDSE</option>
+              <option>B.Tech IT</option>
               <option>B.Tech ECE</option>
-              <option>BBA</option>
+              <option>B.Tech ENC</option>
+              <option>B.Tech CIVIL</option>
+              <option>B.Tech ELECTRICAL</option>
             </select>
           </div>
 

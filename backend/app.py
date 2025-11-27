@@ -311,46 +311,51 @@ def get_student(roll_num: str, db: Session = Depends(get_db)):
 
 # ---------------------------
 # REGISTER
-# ---------------------------
-@app.post("/register")
-def register_user(user: UserRegister, db: Session = Depends(get_db)):
-    existing = db.query(User).filter(User.email == user.email).first()
-    if existing:
-        raise HTTPException(
-            status_code=400,
-            detail=f"This email is already registered as {existing.role}",
+    # # ---------------------------
+    @app.post("/register")
+    def register_user(user: UserRegister, db: Session = Depends(get_db)):
+        existing = db.query(User).filter(User.email == user.email).first()
+        if existing:    
+            raise HTTPException(
+                status_code=400,
+                detail=f"This email is already registered as {existing.role}",
+            )
+
+            existing.role = User.role
+
+        if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+            existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
+            if existing_roll:
+                raise HTTPException(status_code=400, detail="Roll number already exists")
+
+        prepared_password = prepare_password_for_bcrypt(user.password)
+        salt = bcrypt.gensalt()
+        hashed_pw = bcrypt.hashpw(prepared_password.encode("utf-8"), salt).decode("utf-8")
+
+        roll_number_value = None
+        if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
+            roll_number_value = user.rollNumber
+
+        new_user = User(
+            full_name=user.fullName,
+            roll_number=roll_number_value,
+            course=user.course,
+            semester=user.semester,
+            designation = user.designation if user.designation else None,
+            department = user.department if user.department else None,
+            phone=user.phone,
+            email=user.email,
+            password=hashed_pw,
+            profile_pic=user.profilePic,
+            role=user.role
         )
 
-    if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
-        existing_roll = db.query(User).filter(User.roll_number == user.rollNumber).first()
-        if existing_roll:
-            raise HTTPException(status_code=400, detail="Roll number already exists")
+        # Save to database
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
 
-    prepared_password = prepare_password_for_bcrypt(user.password)
-    salt = bcrypt.gensalt()
-    hashed_pw = bcrypt.hashpw(prepared_password.encode("utf-8"), salt).decode("utf-8")
-
-    roll_number_value = None
-    if user.role == "Student" and user.rollNumber and user.rollNumber != "N/A":
-        roll_number_value = user.rollNumber
-
-    new_user = User(
-        full_name=user.fullName,
-        roll_number=roll_number_value,
-        course=user.course,
-        semester=user.semester,
-        phone=user.phone,
-        email=user.email,
-        password=hashed_pw,
-        profile_pic=user.profilePic,
-        role=user.role,
-    )
-
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return {"message": "User registered successfully", "user": new_user}
+        return {"message": "Registration successful", "user": new_user}
 
 
 # ---------------------------
@@ -432,8 +437,10 @@ def update_profile(user_id: int, update: UserUpdate, db: Session = Depends(get_d
         "course": user.course,
         "semester": user.semester,
         "phone": user.phone,
-        "department": getattr(user, "department", None),
-        "designation": getattr(user, "designation", None),
+        # "department": getattr(user, "department", None),
+        # "designation": getattr(user, "designation", None),
+        "department": user.department,
+        "designation": user.designation,
         "profile_pic": user.profile_pic,
         "role": user.role,
         "college": getattr(user, "college", "YMCA"),

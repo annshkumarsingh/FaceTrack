@@ -51,6 +51,7 @@ export default function StudentAssignments() {
           <option value="">Select Semester</option>
           <option>1</option><option>2</option><option>3</option>
           <option>4</option><option>5</option><option>6</option>
+          <option>7</option><option>8</option>
         </select>
 
         <select
@@ -58,11 +59,14 @@ export default function StudentAssignments() {
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
         >
-          <option value="">Select Subject</option>
-          <option>Maths</option>
-          <option>DBMS</option>
-          <option>DSA</option>
-          <option>OS</option>
+              <option value="">Select Course</option>
+              <option>B.Tech CSE</option>
+              <option>B.Tech CDSE</option>
+              <option>B.Tech IT</option>
+              <option>B.Tech ECE</option>
+              <option>B.Tech ENC</option>
+              <option>B.Tech CIVIL</option>
+              <option>B.Tech ELECTRICAL</option>
         </select>
 
         <button

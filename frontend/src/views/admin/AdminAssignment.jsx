@@ -123,8 +123,12 @@ export default function AdminAssignments() {
             >
               <option value="">Select Course</option>
               <option>B.Tech CSE</option>
+              <option>B.Tech CDSE</option>
+              <option>B.Tech IT</option>
               <option>B.Tech ECE</option>
-              <option>BBA</option>
+              <option>B.Tech ENC</option>
+              <option>B.Tech CIVIL</option>
+              <option>B.Tech ELECTRICAL</option>
             </select>
           </div>
 
@@ -156,10 +160,17 @@ export default function AdminAssignments() {
               className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select Subject</option>
+              <option>VLSI Design</option>
+              <option>Microwave Engg.</option>
+              <option>AI & Machine Learning</option>
+              <option>VLSI design Lab</option>
+              <option>Data Communication</option>
+              <option>AI & ML Lab</option>
               <option>DBMS</option>
               <option>OOPS</option>
               <option>Computer Networks</option>
               <option>Operating System</option>
+              
             </select>
           </div>
         </div>
