@@ -4,6 +4,8 @@ import {
   DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
 
+const API_BASE_URL = "http://localhost:8000";
+
 export default function AdminAssignments() {
   const [course, setCourse] = useState("");
   const [semester, setSemester] = useState("");
@@ -14,7 +16,7 @@ export default function AdminAssignments() {
   const [loadingAnswerKey, setLoadingAnswerKey] = useState(false);
 
   // -------------------------
-  // UPLOAD MARKS ONLY
+  // UPLOAD MARKS ONLY (keep as you had, if you use it)
   // -------------------------
   const uploadMarks = async () => {
     if (!course || !semester || !subject || !marksFile) {
@@ -23,7 +25,7 @@ export default function AdminAssignments() {
     }
 
     try {
-      setLoadingMarks(true); // START LOADING
+      setLoadingMarks(true);
 
       const data = new FormData();
       data.append("course", course);
@@ -32,7 +34,7 @@ export default function AdminAssignments() {
       data.append("marksFile", marksFile);
 
       const res = await fetch(
-        "http://127.0.0.1:8000/admin/upload-assignment-marks",
+        `${API_BASE_URL}/admin/upload-assignment-marks`,
         {
           method: "POST",
           body: data,
@@ -43,42 +45,60 @@ export default function AdminAssignments() {
 
       alert("Marks uploaded successfully!");
     } catch (error) {
+      console.error(error);
       alert("Error uploading marks!");
     } finally {
-      setLoadingMarks(false); // STOP LOADING
+      setLoadingMarks(false);
     }
   };
 
   // -------------------------
-  // UPLOAD ANSWER KEY ONLY
+  // UPLOAD ANSWER KEY IMAGE (for OCR -> DB JSON)
   // -------------------------
   const uploadAnswerKey = async () => {
-    if (!course || !semester || !subject || !answerKey) {
-      alert("Please fill all fields and upload answer key.");
+    if (!semester || !subject || !answerKey) {
+      alert("Please select semester, subject and upload an image.");
       return;
     }
 
     try {
-      setLoadingAnswerKey(true); // START LOADING
+      setLoadingAnswerKey(true);
 
       const data = new FormData();
-      data.append("course", course);
-      data.append("semester", semester);
-      data.append("subject", subject);
-      data.append("answerKey", answerKey);
+      // file field MUST be named "file" for the FastAPI endpoint
+      data.append("file", answerKey);
 
-      const res = await fetch("http://127.0.0.1:8000/admin/upload-answer-key", {
-        method: "POST",
-        body: data,
-      });
+      const params = new URLSearchParams({
+        semester,
+        subject,
+        // optional:
+        exam_type: "Sessional 1",
+        course,
+        // if you want to track which teacher uploaded:
+        // teacher_id: String(currentTeacherId),
+      }).toString();
 
-      if (!res.ok) throw new Error("Upload failed");
+      const res = await fetch(
+        `${API_BASE_URL}/answer-keys/upload-image?${params}`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
 
-      alert("Answer key uploaded successfully!");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Upload failed");
+      }
+
+      const result = await res.json();
+      console.log("Answer key saved:", result);
+      alert("Answer key uploaded and parsed successfully!");
     } catch (error) {
-      alert("Error uploading answer key!");
+      console.error(error);
+      alert(error.message || "Error uploading answer key!");
     } finally {
-      setLoadingAnswerKey(false); // STOP LOADING
+      setLoadingAnswerKey(false);
     }
   };
 
@@ -145,7 +165,7 @@ export default function AdminAssignments() {
         </div>
       </div>
 
-      {/* MARKS UPLOAD */}
+      {/* MARKS UPLOAD
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
           Upload Marks
@@ -157,8 +177,8 @@ export default function AdminAssignments() {
         >
           <ArrowUpTrayIcon className="w-10 h-10 text-gray-500 dark:text-gray-300" />
           <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-            <span className="font-medium">Drag & Drop Marks File</span> or Click
-            to Upload
+            <span className="font-medium">Drag &amp; Drop Marks File</span> or
+            Click to Upload
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Accepted: .csv, .xlsx
@@ -177,21 +197,21 @@ export default function AdminAssignments() {
           </p>
         )}
 
-        {/* Marks Upload Button */}
         <button
           onClick={uploadMarks}
           disabled={loadingMarks}
-          className={`mt-4 text-white px-4 py-2 rounded-lg w-full 
-    ${loadingMarks ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"}`}
+          className={`mt-4 text-white px-4 py-2 rounded-lg w-full ${
+            loadingMarks ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
           {loadingMarks ? "Uploading..." : "Upload Marks"}
         </button>
-      </div>
+      </div> */}
 
-      {/* ANSWER KEY UPLOAD */}
+      {/* ANSWER KEY UPLOAD (IMAGE FOR OCR) */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-          Upload Answer Key
+          Upload Assignment Key
         </h3>
 
         <label
@@ -200,12 +220,12 @@ export default function AdminAssignments() {
         >
           <DocumentArrowUpIcon className="w-10 h-10 text-gray-500 dark:text-gray-300" />
           <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-            Upload Answer Key (PDF / DOCX)
+            Upload Assignment (Image: PNG / JPG)
           </p>
           <input
             id="answerKey"
             type="file"
-            accept=".pdf,.docx"
+            accept="image/png,image/jpeg,image/jpg"
             className="hidden"
             onChange={(e) => setAnswerKey(e.target.files[0])}
           />
@@ -217,12 +237,12 @@ export default function AdminAssignments() {
           </p>
         )}
 
-        {/* Answer key Upload Button */}
         <button
           onClick={uploadAnswerKey}
           disabled={loadingAnswerKey}
-          className={`mt-4 text-white px-4 py-2 rounded-lg w-full 
-    ${loadingAnswerKey ? "bg-gray-500" : "bg-blue-600 hover:bg-green-700"}`}
+          className={`mt-4 text-white px-4 py-2 rounded-lg w-full ${
+            loadingAnswerKey ? "bg-gray-500" : "bg-blue-600 hover:bg-green-700"
+          }`}
         >
           {loadingAnswerKey ? "Uploading..." : "Upload Answer Key"}
         </button>

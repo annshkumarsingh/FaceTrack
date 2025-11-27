@@ -1,19 +1,109 @@
 import React, { useState } from "react";
 import { ArrowUpTrayIcon, DocumentArrowUpIcon } from "@heroicons/react/24/outline";
 
+const API_BASE_URL = "http://localhost:8000";
+
 export default function AdminSessionalUpload() {
   const [marksFile, setMarksFile] = useState(null);
   const [solutionFile, setSolutionFile] = useState(null);
   const [course, setCourse] = useState("");
   const [semester, setSemester] = useState("");
   const [sessionalType, setSessionalType] = useState("");
+  const [loadingMarks, setLoadingMarks] = useState(false);
+  const [loadingSolution, setLoadingSolution] = useState(false);
 
   const handleMarksUpload = (e) => {
-    setMarksFile(e.target.files[0]);
+    setMarksFile(e.target.files[0] || null);
   };
 
   const handleSolutionUpload = (e) => {
-    setSolutionFile(e.target.files[0]);
+    setSolutionFile(e.target.files[0] || null);
+  };
+
+  // --------- CALL /sessionals/upload-marks ----------
+  const uploadMarks = async () => {
+    if (!course || !semester || !sessionalType || !marksFile) {
+      alert("Please select course, semester, sessional and upload marks file.");
+      return;
+    }
+
+    try {
+      setLoadingMarks(true);
+
+      const data = new FormData();
+      data.append("file", marksFile);
+
+      const params = new URLSearchParams({
+        course,
+        semester,
+        sessional_type: sessionalType,
+      }).toString();
+
+      const res = await fetch(
+        `${API_BASE_URL}/sessionals/upload-marks?${params}`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Upload failed");
+      }
+
+      const result = await res.json();
+      console.log("Marks upload result:", result);
+      alert(`Marks uploaded successfully (${result.rows_inserted} rows).`);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Error uploading marks");
+    } finally {
+      setLoadingMarks(false);
+    }
+  };
+
+  // --------- CALL /sessionals/upload-solution ----------
+  const uploadSolution = async () => {
+    if (!course || !semester || !sessionalType || !solutionFile) {
+      alert("Please select course, semester, sessional and upload solution PDF.");
+      return;
+    }
+
+    try {
+      setLoadingSolution(true);
+
+      const data = new FormData();
+      data.append("file", solutionFile);
+
+      const params = new URLSearchParams({
+        course,
+        semester,
+        sessional_type: sessionalType,
+      }).toString();
+
+      const res = await fetch(
+        `${API_BASE_URL}/sessionals/upload-solution?${params}`,
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || "Upload failed");
+      }
+
+      const result = await res.json();
+      console.log("Solution upload result:", result);
+      alert("Solution PDF uploaded successfully.");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Error uploading solution");
+    } finally {
+      setLoadingSolution(false);
+    }
   };
 
   return (
@@ -31,7 +121,6 @@ export default function AdminSessionalUpload() {
               Course
             </label>
             <select
-              placeholder="BTech ECE"
               value={course}
               onChange={(e) => setCourse(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500"
@@ -54,7 +143,7 @@ export default function AdminSessionalUpload() {
               className="w-full px-3 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select Semester</option>
-              {[1,2,3,4,5,6,7,8].map((sem) => (
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
                 <option key={sem}>{sem}</option>
               ))}
             </select>
@@ -90,15 +179,21 @@ export default function AdminSessionalUpload() {
         >
           <ArrowUpTrayIcon className="w-10 h-10 text-gray-500 dark:text-gray-300" />
           <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
-            <span className="font-medium">Drag & Drop Marks File Here</span> or Click to Upload
+            <span className="font-medium">Drag &amp; Drop Marks File Here</span> or Click to Upload
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Accepted: .csv, .xlsx
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Required Columns: Roll Number | Name | Marks
+            Required Columns: roll_number | name | marks | [max_marks]
           </p>
-          <input id="marksFile" type="file" className="hidden" onChange={handleMarksUpload} />
+          <input
+            id="marksFile"
+            type="file"
+            accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+            className="hidden"
+            onChange={handleMarksUpload}
+          />
         </label>
 
         {marksFile && (
@@ -106,6 +201,16 @@ export default function AdminSessionalUpload() {
             Uploaded: {marksFile.name}
           </p>
         )}
+
+        <button
+          onClick={uploadMarks}
+          disabled={loadingMarks}
+          className={`mt-4 text-white px-4 py-2 rounded-lg w-full ${
+            loadingMarks ? "bg-gray-500" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {loadingMarks ? "Uploading..." : "Upload Marks"}
+        </button>
       </div>
 
       {/* SOLUTION PDF UPLOAD */}
@@ -122,8 +227,16 @@ export default function AdminSessionalUpload() {
           <p className="text-sm text-gray-700 dark:text-gray-300 mt-2">
             Upload Solution PDF
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Accepted Format: PDF</p>
-          <input id="solutionFile" type="file" accept="application/pdf" className="hidden" onChange={handleSolutionUpload} />
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Accepted Format: PDF
+          </p>
+          <input
+            id="solutionFile"
+            type="file"
+            accept="application/pdf"
+            className="hidden"
+            onChange={handleSolutionUpload}
+          />
         </label>
 
         {solutionFile && (
@@ -131,6 +244,16 @@ export default function AdminSessionalUpload() {
             Uploaded: {solutionFile.name}
           </p>
         )}
+
+        <button
+          onClick={uploadSolution}
+          disabled={loadingSolution}
+          className={`mt-4 text-white px-4 py-2 rounded-lg w-full ${
+            loadingSolution ? "bg-gray-500" : "bg-green-600 hover:bg-green-700"
+          }`}
+        >
+          {loadingSolution ? "Uploading..." : "Upload Solution"}
+        </button>
       </div>
     </div>
   );

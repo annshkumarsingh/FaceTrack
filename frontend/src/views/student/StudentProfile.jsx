@@ -56,18 +56,12 @@ export default function StudentProfile({ user, onLogout }) {
       {/* Profile Card */}
       <div className="bg-white dark:bg-gray-800 dark:text-gray-200 shadow rounded-lg p-6 flex flex-col md:flex-row gap-6">
         <div className="flex-shrink-0">
-{/* <<<<<<< HEAD */}
-          <img
-            src={profile.profile_pic}/>
-// =======
-          {/* <img
-            src={profile.imageUrl}
-// >>>>>>> f3442f2 (my changes)
-            alt={profile.name}
-            className="h-32 w-32 rounded-full border object-cover"
-          /> */}
-        </div>
-
+  <img
+    src={profile.profile_pic}
+    alt={profile.name}
+    className="h-32 w-32 rounded-full border object-cover"
+  />
+</div>
         <div className="flex-1 space-y-2">
           <p>
             <strong>Name:</strong> {profile.name}

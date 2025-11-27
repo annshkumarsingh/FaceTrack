@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, ForeignKey, TIMESTAMP, DateTime,
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base
+from sqlalchemy.dialects.postgresql import JSONB  
+
 
 # ---------------------
 # USERS TABLE
@@ -144,3 +146,71 @@ class StudentMarks(Base):
     subject = Column(String)
     file_path = Column(String)
     uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+
+
+
+class AnswerKey(Base):
+    __tablename__ = "answer_keys"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Link to context
+    course = Column(String, nullable=True)       # e.g. "B.Tech - ECE"
+    semester = Column(String, nullable=False)    # e.g. "3"
+    subject = Column(String, nullable=False)     # e.g. "DBMS" or "ECE-401: VLSI"
+
+    exam_type = Column(String, nullable=True)    # e.g. "Sessional 1", "Assignment 2"
+
+    # Raw structured data: list of questions
+    # [
+    #   { "q_no": 1, "question": "....", "answer": "...." },
+    #   ...
+    # ]
+    qa_data = Column(JSONB, nullable=False)
+
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=True)  # teacher id
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+    teacher = relationship("User", foreign_keys=[uploaded_by])
+
+
+
+
+
+class SessionalMarks(Base):
+    __tablename__ = "sessional_marks"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course = Column(String, nullable=False)
+    semester = Column(String, nullable=False)
+    sessional_type = Column(String, nullable=False)  # e.g. "Sessional 1"
+    subject = Column(String, nullable=True)          # optional if you later add subject
+
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    roll_number = Column(String, nullable=False)
+    student_name = Column(String, nullable=True)
+    marks = Column(Float, nullable=False)
+    max_marks = Column(Float, nullable=True)
+
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
+
+    student = relationship("User", foreign_keys=[student_id])
+
+
+
+class SessionalSolution(Base):
+    __tablename__ = "sessional_solutions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course = Column(String, nullable=False)
+    semester = Column(String, nullable=False)
+    sessional_type = Column(String, nullable=False)  # "Sessional 1"
+    subject = Column(String, nullable=True)
+
+    # Either full raw text or structured Q/A
+    raw_text = Column(Text, nullable=True)
+    qa_data = Column(JSONB, nullable=True)
+
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text('now()'))
