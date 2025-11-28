@@ -225,5 +225,3 @@ VITE_BACKEND_URL=http://localhost:8000
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-
-## Footer
