@@ -1,259 +1,229 @@
-#📌 FaceTrack – Smart Attendance System
 
-A full-stack AI-enabled smart attendance and academic management system designed for university environments. FaceTrack automates attendance using DeepFace-based face detection & recognition (local version), while also providing schedule management, leave management, announcements, sessional marks, assignment uploads, and student dashboards.
+## FaceTrack - Smart Attendance System
+A full-stack web platform for automated attendance, academic workflow management, and student–admin collaboration.
+## Description
 
-🔗 ###Live Frontend: https://facetrack-ai.vercel.app
+𝐅𝐚𝐜𝐞𝐓𝐫𝐚𝐜𝐤 – 𝐒𝐦𝐚𝐫𝐭 𝐀𝐭𝐭𝐞𝐧𝐝𝐚𝐧𝐜𝐞 𝐒𝐲𝐬𝐭𝐞𝐦 is a university-level digital platform that automates attendance using 𝐟𝐚𝐜𝐞 𝐝𝐞𝐭𝐞𝐜𝐭𝐢𝐨𝐧 & 𝐟𝐚𝐜𝐞 𝐫𝐞𝐜𝐨𝐠𝐧𝐢𝐭𝐢𝐨𝐧 (local version) and centralizes academic workflows such as timetables, marks, assignments, announcements, and leave management.
 
-🔗 ###Live Backend: https://facetrack-lia6.onrender.com
+The system includes:
 
-⚠️ ###Note:
-Due to FastAPI + DeepFace model limitations on Render free tier, attendance marking (face recognition) is available only in the localhost version, not in the deployed version.
-All other modules work perfectly in both versions.
+✔ React frontend (Vercel)
 
-📌 🚀 #Features
-✅ ##Student Features
+✔ FastAPI backend (Render)
 
-Face-based attendance (available in localhost version)
+✔ PostgreSQL database (Supabase / Neon)
 
-View daily & subject-wise attendance logs
+✔ Local AI-powered attendance using DeepFace
 
-View academic calendar & weekly class schedule
+✔ Deployed academic management system for daily use
 
-View sessional marks & assignment marks
+It is scalable, secure, institution-ready, and designed to eliminate proxy attendance while improving transparency and automation.
+## Badges
 
-Download assignment solutions uploaded by admin
-
-Apply for leave & track leave status
-
-Access announcements from admin/faculty
-
-Manage profile (photo, address, phone, etc.)
-
-✅ ##Admin Features
-
-Approve/reject student leave requests
-
-Upload weekly timetable via Excel / CSV
-
-Upload scanned timetable images (OCR extraction supported)
-
-Upload sessional marks, assignment marks, and assignment solutions
-
-Manage students (view, search, remove)
-
-Post announcements
-
-View platform-wide dashboard stats
-
-✔️ ##AI/ML Components
-
-DeepFace-based:
-
-Face Detection
-
-Face Alignment
-
-Face Verification (one-to-one matching)
-
-📌 ##Architecture Overview
-Localhost Version (Full System)
-React Frontend (localhost) 
-      ↓
-FastAPI Server (localhost)
-      ↓
-Supabase / Neon PostgreSQL Database
+![React](https://img.shields.io/badge/Frontend-React-blue)
+![FastAPI](https://img.shields.io/badge/Backend-FastAPI-teal)
+![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue)
+![Status](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 
-This version supports real-time face attendance using DeepFace.
+## Features
 
-##Deployed Version (Live)
-React Frontend (Vercel)
-      ↓
-FastAPI Backend (Render)
-      ↓
-Neon PostgreSQL Database
+🎓 𝐒𝐭𝐮𝐝𝐞𝐧𝐭 𝐅𝐞𝐚𝐭𝐮𝐫𝐞𝐬
 
+• View subject-wise & day-wise attendance
 
-Supports all features except attendance marking (DeepFace heavy models not supported on Render free tier).
+• View weekly schedule
 
-📌 🛠️ #Technology Stack
-#Frontend
+• Download attendance reports
 
-React.js
+• View sessional marks & assignment marks
 
-React Router DOM
+• Download assignment solutions
+
+• Apply for leave & track status
+
+• View announcements
+
+• Manage profile details
+
+🧑‍💼 𝐀𝐝𝐦𝐢𝐧 𝐅𝐞𝐚𝐭𝐮𝐫𝐞𝐬
+
+• Upload timetables (Excel/CSV)
+
+• Upload sessional & assignment marks
+
+• Upload assignment solutions
+
+• Post announcements
+
+• Approve/Reject leave requests
+
+• Manage student profiles
+
+• View attendance logs
+
+🤖 𝐀𝐈-𝐏𝐨𝐰𝐞𝐫𝐞𝐝 𝐀𝐭𝐭𝐞𝐧𝐝𝐚𝐧𝐜𝐞 (𝐋𝐨𝐜𝐚𝐥 𝐕𝐞𝐫𝐬𝐢𝐨𝐧)
+
+• DeepFace-based face detection & recognition
+
+• Automatic attendance marking
+
+• Real-time verification logs 
+
+☁️ 𝐂𝐥𝐨𝐮𝐝 𝐃𝐞𝐩𝐥𝐨𝐲𝐦𝐞𝐧𝐭 (𝐎𝐧𝐥𝐢𝐧𝐞 𝐌𝐨𝐝𝐞)
+
+• All academic features enabled
+
+• Attendance via face recognition disabled on free-tier Render 
+## Tech Stack
+
+𝐅𝐫𝐨𝐧𝐭𝐞𝐧𝐝
+
+React.js (SPA)
 
 Tailwind CSS
 
 Heroicons
 
-Fetch API
-
-LocalStorage API
-
-Vercel (deployment)
-
-Backend
+𝐁𝐚𝐜𝐤𝐞𝐧𝐝
 
 FastAPI
 
 Uvicorn
 
-DeepFace
+DeepFace (local)
 
-Pydantic
+Pandas, OpenPyXL
 
-Pandas (Excel/CSV timetable parsing)
+𝐃𝐚𝐭𝐚𝐛𝐚𝐬𝐞
 
-OpenPyXL
+PostgreSQL (Supabase Local / Neon Cloud)
 
-Render (deployment)
+𝐃𝐞𝐩𝐥𝐨𝐲𝐦𝐞𝐧𝐭
 
-Database
+Frontend → Vercel
+
+Backend → Render
+
+DB → Neon / Supabase
+
+## Architecture
+
+𝐇𝐢𝐠𝐡-𝐥𝐞𝐯𝐞𝐥 𝐰𝐨𝐫𝐤𝐟𝐥𝐨𝐰:
+
+• User authenticates (Student/Admin)
+
+• Role-based dashboards
+
+• REST API communication
+
+• Attendance via DeepFace (local)
+
+• Admin uploads timetables, marks, assignments
+
+• Students view data from PostgreSQL
+
+• Cloud deployment for non-AI modules
+## Installation
+
+𝐏𝐫𝐞𝐫𝐞𝐪𝐮𝐢𝐬𝐢𝐭𝐞𝐬
+
+Node.js ≥ 16
+
+Python ≥ 3.9
 
 PostgreSQL
 
-Supabase (local version / development DB)
+Git
 
-Neon (production / deployed DB)
+𝐂𝐥𝐨𝐧𝐞 𝐑𝐞𝐩𝐨
 
-📌 📁 #Project Structure
-FaceTrack/
-│── frontend/
-│   ├── src/
-│   ├── components/
-│   ├── views/
-│   ├── utils/
-│   └── styles/
-│── backend/
-│   ├── app/
-│   ├── routers/
-│   ├── models/
-│   ├── database/
-│   └── services/
-└── README.md
-
-📌 🌐 #Deployment URLs
-Component	Platform	URL
-Frontend	Vercel	https://facetrack-ai.vercel.app
-
-Backend	Render	https://facetrack-lia6.onrender.com
-
-Local Backend	Localhost	http://localhost:8000
-📌 🔐 #Environment Variables
-##Frontend (.env)
-VITE_GEMINI_API_KEY=AIzaSyDGCvM-9DqR0l0bSSCvWknIjc4EhBKTXVM
-VITE_BACKEND_URL=http://localhost:8000
-VITE_HEADLESS=False
-
-##Backend (.env)
-
-Supabase:
-
-POSTGRE_DATABASE_URL=postgresql://postgres:Aiattendance%40123@db.wuavfrozdmexfccjkyxf.supabase.co:5432/postgres
-
-
-Neon:
-
-POSTGRE_DATABASE_URL=postgresql://neondb_owner:npg_A7weVhEvc8Kk@ep-tiny-block-a48hy462-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
-
-
-General:
-
-BACKEND_URL=http://localhost:8000
-HEADLESS=False
-
-📌 🧪 #Running the Project Locally
-1️⃣ ##Clone the Repo
+```bash
 git clone https://github.com/annshkumarsingh/FaceTrack
 cd FaceTrack
+```
 
-2️⃣ ##Run Backend
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-
-
-Backend will run at:
-
-http://localhost:8000
-
-3️⃣ ##Run Frontend
+𝐅𝐫𝐨𝐧𝐭𝐞𝐧𝐝 𝐒𝐞𝐭𝐮𝐩
+```arduino
 cd frontend
 npm install
 npm run dev
+```
+𝐒𝐞𝐭 𝐞𝐧𝐯𝐢𝐫𝐨𝐧𝐦𝐞𝐧𝐭 𝐯𝐚𝐫𝐢𝐚𝐛𝐥𝐞𝐬:
+```ini
+VITE_BACKEND_URL=http://localhost:8000
+```
+
+## Usage/Examples
+
+🧑‍🎓 𝐒𝐭𝐮𝐝𝐞𝐧𝐭
+
+• Login → Dashboard
+
+• View Attendance → View Reports
+
+• Open Weekly Schedule
+
+• Download Assignments & Marks
+
+• Apply for Leave
+
+🧑‍💼 𝐀𝐝𝐦𝐢𝐧
+
+• Login → Admin Dashboard
+
+• Manage Students
+
+• Upload Timetable (Excel/CSV)
+
+• Upload Marks / Assignment Solutions
+
+• Post Announcements
+
+• Approve Leave Requests
+
+🤖 Local AI Attendance
+```markdown
+1. Open /attendance
+2. Allow webcam access
+3. Capture face → API call
+4. DeepFace verification
+5. Attendance stored in DB
+```
+## Deployment
+
+𝐅𝐫𝐨𝐧𝐭𝐞𝐧𝐝 (𝐕𝐞𝐫𝐜𝐞𝐥)
+
+• Connect GitHub repo
+
+• Add environment variables
+
+• Deploy automatically
+
+𝐁𝐚𝐜𝐤𝐞𝐧𝐝 (𝐑𝐞𝐧𝐝𝐞𝐫)
+
+• Create web service
+
+• Use Python Build & Start commands
+
+• Add environment variables
+
+• Use Neon PostgreSQL URL
+
+## Contributors
+
+• 𝐀𝐧𝐧𝐬𝐡 𝐊𝐮𝐦𝐚𝐫 𝐒𝐢𝐧𝐠𝐡
+
+• 𝐁𝐚𝐥𝐰𝐢𝐧𝐝𝐞𝐫 𝐒𝐢𝐧𝐠𝐡
+
+• 𝐊𝐞𝐬𝐡𝐚𝐯
+
+• 𝐍𝐞𝐡𝐚
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
 
 
-Frontend will run at:
-
-http://localhost:5173
-
-📌 📤 #API Documentation
-
-Once backend is running locally, view interactive documentation:
-
-Swagger UI:
-
-http://localhost:8000/docs
-
-
-ReDoc:
-
-http://localhost:8000/redoc
-
-📌 📄 #Modules Overview
-✔ ##Attendance Module
-
-Webcam capture → backend (base64)
-
-DeepFace verification
-
-If matched → attendance saved in DB
-
-✔ ##Schedule Module
-
-Upload Excel/CSV
-
-Auto-parse using Pandas
-
-Optional image upload → OCR → manual entry
-
-✔ ##Leave Management
-
-Students apply
-
-Admin approves/rejects
-
-Status updates in dashboard
-
-✔ ##Marks & Assignments Module
-
-Admin uploads:
-
-Sessional marks
-
-Assignment marks
-
-Assignment solutions (PDF/images)
-
-Students view/download
-
-✔ ##Announcement Module
-
-Admin posts updates
-
-Students view chronologically
-
-📌 🤝 #Contributors
-
-Annsh Kumar Singh
-
-Balwinder Singh
-
-Keshav
-
-Neha
-
-📌 📜 #License
-
-This project is open-source. You may use it for learning, research, or academic purposes.
+## Footer
